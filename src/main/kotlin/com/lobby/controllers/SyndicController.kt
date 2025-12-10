@@ -1,6 +1,5 @@
 package com.lobby.controllers
 
-import com.lobby.dto.AccountsListDto
 import com.lobby.dto.BanDto
 import com.lobby.dto.SetRoleDto
 import com.lobby.enums.AccountStatus
@@ -42,9 +41,9 @@ class AdminAccountController(private val accountRepository: AccountRepository, p
         )
     }
 
-    @GetMapping("/account")
-    fun getAccount(@RequestBody request: AccountsListDto): ResponseEntity<Any> {
-        val account = accountRepository.findByUsernameOrEmail(request.login, request.login)
+    @GetMapping("/account/{login}")
+    fun getAccount(@PathVariable login: String): ResponseEntity<Any> {
+        val account = accountRepository.findByUsernameOrEmail(login, login)
         return if (account != null) {
             ResponseEntity.ok(
                 mapOf(
