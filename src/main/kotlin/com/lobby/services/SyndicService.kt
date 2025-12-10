@@ -32,6 +32,27 @@ class SyndicService(
         return ResponseEntity.ok(mapOf("success" to true, "accounts" to accounts))
     }
 
+    fun approveAccount(login: String): ResponseEntity<Any> {
+        val account = accountRepository.findByUsernameOrEmail(login, login)
+            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(mapOf("success" to false, "message" to "Conta não encontrada."))
+
+        if (account.accountStatus == AccountStatus.APPROVED) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(mapOf("success" to false, "message" to "Esta conta já está aprovada."))
+        }
+
+        account.accountStatus = AccountStatus.APPROVED
+        accountRepository.save(account)
+
+        return ResponseEntity.ok(
+            mapOf(
+                "success" to true,
+                "message" to "Conta aprovada com sucesso! O usuário ${account.username} já pode fazer login."
+            )
+        )
+    }
+
     fun getAccountByLogin(login: String): ResponseEntity<Any> {
         val account = accountRepository.findByUsernameOrEmail(login, login)
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)

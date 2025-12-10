@@ -22,6 +22,11 @@ class SyndicController(
         return syndicService.getPendingAccounts()
     }
 
+    @PatchMapping("/accounts/approve/{login}")
+    fun approveAccount(@PathVariable login: String): ResponseEntity<Any> {
+        return syndicService.approveAccount(login)
+    }
+
     @GetMapping("/account/{login}")
     fun getAccount(@PathVariable login: String): ResponseEntity<Any> {
         return syndicService.getAccountByLogin(login)
