@@ -62,11 +62,3 @@ Uma API RESTful robusta que gerencia o ciclo de vida completo de uma encomenda, 
 | Método | Rota | Descrição |
 | :--- | :--- | :--- |
 | `GET` | `/api/deliveries` | Lista histórico de encomendas pessoais. |
-
----
-
-## 🏃‍♂️ Como Rodar
-
-1. Clone o repositório:
-```bash
-git clone [https://github.com/seu-usuario/lobby-api.git](https://github.com/seu-usuario/lobby-api.git)
