@@ -16,13 +16,13 @@ class SecurityConfig(private val jwtAuthenticationFilter: JwtAuthenticationFilte
         http
             .csrf { it.disable() }
             .authorizeHttpRequests {
-                it.requestMatchers("/auth/**").permitAll()
+                it.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                it.requestMatchers("/api/auth/**").permitAll()
                 it.requestMatchers("/api/doorman/**").hasRole("DOORMAN")
-                it.requestMatchers("/syndic/**").hasRole("SYNDIC")
+                it.requestMatchers("/api/syndic/**").hasRole("SYNDIC")
                 it.anyRequest().authenticated()
             }
             .formLogin { it.disable() }
-
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build()

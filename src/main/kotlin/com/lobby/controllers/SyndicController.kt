@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/syndic")
+@RequestMapping("/api/syndic")
 class SyndicController(
     private val syndicService: SyndicService,
 ) {
