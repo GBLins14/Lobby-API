@@ -1,64 +1,80 @@
-# 🏢 Lobby API
+# 🏢 Lobby API - Gestão Logística para Condomínios
 
-![Kotlin](https://img.shields.io/badge/kotlin-%237F52FF.svg?style=for-the-badge&logo=kotlin&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
-![Security](https://img.shields.io/badge/spring%20security-%236DB33F.svg?style=for-the-badge&logo=spring-security&logoColor=white)
-![JPA](https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=Hibernate&logoColor=white)
+![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
+![Spring Security](https://img.shields.io/badge/Spring_Security-6DB33F?style=for-the-badge&logo=spring-security&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
 
-> **Lobby** é uma solução de logística inteligente para condomínios, focada em substituir o caderno de papel da portaria por uma gestão digital, segura e rastreável.
+> **Lobby** é uma solução backend robusta para digitalizar a portaria de condomínios. Substitui o caderno de papel por uma API segura, auditável e com notificações em tempo real.
+
+---
 
 ## 🎯 O Problema
-A gestão de encomendas em portarias é caótica. Cadernos de papel, falta de aviso aos moradores e dificuldade em localizar pacotes geram insegurança e atrasos.
+A gestão de encomendas em portarias tradicionais é falha: cadernos de papel ilegíveis, extravios de pacotes e falta de comunicação com os moradores geram insegurança e atrito.
 
-## 💡 A Solução (MVP)
-Uma API RESTful robusta que gerencia o ciclo de vida completo de uma encomenda, desde a chegada na portaria até a retirada pelo morador, com controle de acesso rigoroso.
-
----
-
-## 🔥 Funcionalidades Principais
-
-### 🔐 Segurança & Controle de Acesso (RBAC)
-* **Autenticação JWT:** Login seguro com tokens expiráveis.
-* **Perfis de Usuário:**
-    * `ROLE_DOORMAN`: Acesso administrativo para registrar e entregar pacotes.
-    * `ROLE_RESIDENT`: Acesso restrito para visualizar apenas suas próprias encomendas.
-* **Fluxo de Aprovação:** Contas de porteiros são criadas com status `PENDING` e bloqueadas automaticamente até aprovação do administrador/síndico.
-
-### 📦 Gestão Logística
-* **Registro Inteligente:** O porteiro vincula a encomenda ao morador.
-* **Auto-Tracking:** Se a encomenda não tiver código de rastreio, o sistema gera um identificador único (ex: `LOBBY-A1B2C3`) automaticamente.
-* **Baixa Segura:** Confirmação de retirada com registro de data/hora (`withdrawalDate`) e mudança de status para `DELIVERED`.
-* **Validação de Status:** O sistema impede que uma encomenda já entregue seja baixada novamente.
+## 💡 A Solução
+Uma API RESTful desenvolvida com **Arquitetura em Camadas (Service Layer)**, focada em segurança e performance. O sistema gerencia o ciclo de vida da encomenda, desde a chegada até a retirada, notificando o morador instantaneamente via e-mail.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🔥 Funcionalidades de Engenharia
 
-* **Linguagem:** Kotlin ⚡
-* **Framework:** Spring Boot 3
-* **Segurança:** Spring Security + JWT Filters
-* **Banco de Dados:** PostgreSQL (Produção) / H2 (Dev)
-* **ORM:** Spring Data JPA (Hibernate)
-* **Build Tool:** Gradle
+### 🔐 Segurança (Security & JWT)
+* **Autenticação Stateless:** Uso de JWT (JSON Web Tokens) com controle de sessão via `tokenVersion` (permite invalidar tokens em caso de roubo ou banimento).
+* **Proteção contra Brute-Force:** O sistema detecta tentativas falhas de login e **bane temporariamente** o IP/Usuário após 5 erros.
+* **RBAC (Role-Based Access Control):**
+    * `SYNDIC`: Gestão total (Aprovar porteiros, banir usuários, ver logs).
+    * `DOORMAN`: Registrar e entregar encomendas.
+    * `RESIDENT`: Apenas visualização de suas encomendas.
+
+### 📧 Notificações Ricas (JavaMailSender)
+* **E-mails Transacionais:** Integração SMTP (Gmail/Brevo).
+* **Templates HTML:** O morador recebe um e-mail visualmente formatado com o código de rastreio assim que a encomenda chega.
+
+### 📦 Logística & Rastreio
+* **Rastreio Híbrido:** Gera automaticamente um código interno único (UUID curto) se não houver etiqueta.
+* **Ciclo de Vida:** `WAITING_PICKUP` -> `DELIVERED`.
+* **Auditoria:** Registo exato da data/hora de retirada (`withdrawalDate`).
+
+### 📚 Documentação Viva
+* **Swagger UI (OpenAPI 3):** Documentação interativa gerada automaticamente.
+* Acessível em: `/swagger-ui/index.html`
 
 ---
 
-## 🚀 Endpoints da API
+## 🛠️ Stack Tecnológica
 
-### 🔑 Autenticação
-| Método | Rota | Descrição |
-| :--- | :--- | :--- |
-| `POST` | `/auth/sign-up` | Cria nova conta (Porteiros nascem PENDING). |
-| `POST` | `/auth/sign-in` | Login e geração de Token JWT. |
+* **Core:** Kotlin, Java 17, Spring Boot 3.
+* **Dados:** Spring Data JPA, PostgreSQL.
+* **Segurança:** Spring Security 6, BCrypt, JWT.
+* **Infraestrutura:** Docker, Railway (Cloud), Gradle.
+* **Ferramentas:** Mailtrap/Gmail SMTP, IntelliJ IDEA.
 
-### 👮 Porteiro (Doorman)
-| Método | Rota | Descrição |
-| :--- | :--- | :--- |
-| `POST` | `/api/doorman/deliveries` | Registra nova encomenda para um morador. |
-| `GET` | `/api/doorman/deliveries/{code}` | Busca detalhes de uma encomenda pelo código. |
-| `PUT` | `/api/doorman/deliveries/{code}/confirm` | Confirma a retirada (Muda status para DELIVERED). |
+---
 
-### 🏠 Morador (Resident)
-| Método | Rota | Descrição |
-| :--- | :--- | :--- |
-| `GET` | `/api/deliveries` | Lista histórico de encomendas pessoais. |
+## 🚀 Como Rodar o Projeto
+
+### Pré-requisitos
+* Java 17+
+* Docker (Opcional, mas recomendado)
+
+### 1. Clone o repositório
+git clone [https://github.com/SEU_USUARIO/lobby-backend.git](https://github.com/SEU_USUARIO/lobby-backend.git)
+cd lobby-backend
+
+### 2. Configure as Variáveis de Ambiente
+Crie um arquivo .env na raiz do projeto (baseado no !.env.example) e configure as suas credenciais.
+
+### 3. Rodando com Docker (Recomendado) 🐳
+docker build -t lobby-api .
+docker run -p 8080:8080 --env-file .env lobby-api
+
+### 4. Rodando Localmente (Gradle)
+./gradlew bootRun
+
+🤝 Contribuição
+Projeto desenvolvido como MVP para estudo avançado de arquitetura backend com Kotlin.
+
+<div align="center"> <sub>Desenvolvido por <b>Gabriel Lins</b> 🚀</sub> </div>
