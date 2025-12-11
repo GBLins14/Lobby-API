@@ -61,18 +61,24 @@ Uma API RESTful desenvolvida com **Arquitetura em Camadas (Service Layer)**, foc
 * Docker (Opcional, mas recomendado)
 
 ### 1. Clone o repositório
-git clone [https://github.com/SEU_USUARIO/lobby-backend.git](https://github.com/SEU_USUARIO/lobby-backend.git)
+```bash 
+git clone https://github.com/SEU_USUARIO/lobby-backend.git 
 cd lobby-backend
+```
 
 ### 2. Configure as Variáveis de Ambiente
 Crie um arquivo .env na raiz do projeto (baseado no !.env.example) e configure as suas credenciais.
 
 ### 3. Rodando com Docker (Recomendado) 🐳
+```bash
 docker build -t lobby-api .
 docker run -p 8080:8080 --env-file .env lobby-api
+```
 
 ### 4. Rodando Localmente (Gradle)
+```bash
 ./gradlew bootRun
+```
 
 🤝 Contribuição
 Projeto desenvolvido como MVP para estudo avançado de arquitetura backend com Kotlin.
