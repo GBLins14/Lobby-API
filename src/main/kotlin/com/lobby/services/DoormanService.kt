@@ -15,7 +15,8 @@ import java.time.LocalDateTime
 @Service
 class DoormanService(
     private val deliveryRepository: DeliveryRepository,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val notificationService: NotificationService
 ) {
     fun registerDelivery(request: CreateDeliveryDto, doormanUsername: String): ResponseEntity<Any> {
         val doorman = accountRepository.findByUsername(doormanUsername)
@@ -35,6 +36,16 @@ class DoormanService(
         )
 
         deliveryRepository.save(delivery)
+
+        try {
+            notificationService.sendArrivalNotification(
+                email = resident.email,
+                residentName = resident.fullName ?: "Morador",
+                trackingCode = delivery.trackingCode
+            )
+        } catch (e: Exception) {
+            println("Erro ao enviar e-mail: ${e.message}")
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(mapOf("success" to true, "message" to "Entrega registrada!"))

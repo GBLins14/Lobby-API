@@ -6,5 +6,5 @@ fun generateTrackingCode(): String {
         .map { characters.random() }
         .joinToString("")
 
-    return randomString // Resultado: A1B2C3
+    return randomString
 }

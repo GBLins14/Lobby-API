@@ -27,7 +27,7 @@ class SyndicController(
         return syndicService.approveAccount(login)
     }
 
-    @GetMapping("/account/{login}")
+    @GetMapping("/accounts/{login}")
     fun getAccount(@PathVariable login: String): ResponseEntity<Any> {
         return syndicService.getAccountByLogin(login)
     }
