@@ -6,6 +6,7 @@ import com.lobby.enums.AccountStatus
 import com.lobby.enums.Role
 import com.lobby.models.CustomUserDetails
 import com.lobby.repositories.AccountRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
@@ -32,8 +33,8 @@ class SyndicService(
         return ResponseEntity.ok(mapOf("success" to true, "accounts" to accounts))
     }
 
-    fun approveAccount(login: String): ResponseEntity<Any> {
-        val account = accountRepository.findByUsernameOrEmail(login, login)
+    fun approveAccount(accountId: Long): ResponseEntity<Any> {
+        val account = accountRepository.findByIdOrNull(accountId)
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(mapOf("success" to false, "message" to "Conta não encontrada."))
 
@@ -53,16 +54,16 @@ class SyndicService(
         )
     }
 
-    fun getAccountByLogin(login: String): ResponseEntity<Any> {
-        val account = accountRepository.findByUsernameOrEmail(login, login)
+    fun getAccountByLogin(accountId: Long): ResponseEntity<Any> {
+        val account = accountRepository.findByIdOrNull(accountId)
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(mapOf("success" to false, "message" to "Conta não encontrada."))
 
-        return ResponseEntity.ok(mapOf("success" to true, "account" to account))
+        return ResponseEntity.ok(mapOf("success" to true, "accounts" to account))
     }
 
     fun updateRole(request: SetRoleDto): ResponseEntity<Any> {
-        val account = accountRepository.findByUsernameOrEmail(request.login, request.login)
+        val account = accountRepository.findByIdOrNull(request.id)
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(mapOf("success" to false, "message" to "Conta não encontrada."))
 
@@ -75,7 +76,7 @@ class SyndicService(
         accountRepository.save(account)
 
         return ResponseEntity.ok(
-            mapOf("success" to true, "message" to "Cargo atualizado com sucesso. Login: ${request.login}, Cargo: ${request.role}")
+            mapOf("success" to true, "message" to "Cargo atualizado com sucesso. ID: ${request.id}, Cargo: ${request.role}")
         )
     }
 
@@ -85,16 +86,15 @@ class SyndicService(
     }
 
     fun banAccount(request: BanDto): ResponseEntity<Any> {
-        val account = accountRepository.findByUsernameOrEmail(request.login, request.login)
+        val account = accountRepository.findByIdOrNull(request.id)
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(mapOf("success" to false, "message" to "Conta não encontrada."))
 
         val now = LocalDateTime.now()
 
-        // Lógica: Se duration ou unit forem nulos, é ban permanente
         if (request.duration == null || request.unit == null) {
             account.banned = true
-            account.bannedAt = null // Permanente não tem data de início específica de "castigo", é estado
+            account.bannedAt = null
             account.banExpiresAt = null
         } else {
             account.banned = true
@@ -102,21 +102,19 @@ class SyndicService(
             account.banExpiresAt = now.plus(request.duration, request.unit)
         }
 
-        // Invalida o token atual incrementando a versão
         account.tokenVersion += 1
         accountRepository.save(account)
 
-        // Se o admin se baniu a si mesmo (cuidado!), desloga ele
         checkSelfBan(account.id)
 
         val typeMsg = if (request.duration == null) "Permanente" else "${request.duration} ${request.unit}"
         return ResponseEntity.ok(
-            mapOf("success" to true, "message" to "Conta banida com sucesso. Login: ${request.login}, Tempo: $typeMsg.")
+            mapOf("success" to true, "message" to "Conta banida com sucesso. ID: ${request.id}, Tempo: $typeMsg.")
         )
     }
 
-    fun unbanAccount(login: String): ResponseEntity<Any> {
-        val account = accountRepository.findByUsernameOrEmail(login, login)
+    fun unbanAccount(accountId: Long): ResponseEntity<Any> {
+        val account = accountRepository.findByIdOrNull(accountId)
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(mapOf("success" to false, "message" to "Conta não encontrada."))
 
@@ -130,7 +128,7 @@ class SyndicService(
         account.banExpiresAt = null
         accountRepository.save(account)
 
-        return ResponseEntity.ok(mapOf("success" to true, "message" to "Conta desbanida com sucesso. Login: $login"))
+        return ResponseEntity.ok(mapOf("success" to true, "message" to "Conta desbanida com sucesso. ID: $accountId"))
     }
 
     fun getBannedAccounts(): ResponseEntity<Any> {
@@ -139,15 +137,14 @@ class SyndicService(
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(mapOf("success" to false, "message" to "Nenhuma conta banida encontrada."))
         }
-        return ResponseEntity.ok(mapOf("success" to true, "accountsBanned" to accounts))
+        return ResponseEntity.ok(mapOf("success" to true, "accounts" to accounts))
     }
 
-    fun deleteAccount(login: String): ResponseEntity<Any> {
-        val account = accountRepository.findByUsernameOrEmail(login, login)
+    fun deleteAccount(accountId: Long): ResponseEntity<Any> {
+        val account = accountRepository.findByIdOrNull(accountId)
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(mapOf("success" to false, "message" to "Conta não encontrada."))
 
-        // Opcional: Impedir que o admin se delete a si mesmo
         val auth = SecurityContextHolder.getContext().authentication?.principal
         if (auth is CustomUserDetails && auth.user.id == account.id) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -155,10 +152,9 @@ class SyndicService(
         }
 
         accountRepository.delete(account)
-        return ResponseEntity.ok(mapOf("success" to true, "message" to "Conta deletada com sucesso. Login: $login"))
+        return ResponseEntity.ok(mapOf("success" to true, "message" to "Conta deletada com sucesso. ID: $accountId"))
     }
 
-    // Função auxiliar privada para verificar se o usuário logado afetou a si mesmo
     private fun checkSelfBan(targetUserId: Long) {
         val auth = SecurityContextHolder.getContext().authentication
         val principal = auth?.principal

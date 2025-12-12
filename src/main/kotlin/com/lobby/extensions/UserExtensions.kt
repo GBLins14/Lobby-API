@@ -13,6 +13,7 @@ fun User.toResponseDTO(): UserResponse {
         email = this.email,
         phone = this.phone,
         role = this.role.name,
-        apartmentNumber = this.apartmentNumber
+        apartmentNumber = this.apartmentNumber,
+        accountStatus = this.accountStatus
     )
 }

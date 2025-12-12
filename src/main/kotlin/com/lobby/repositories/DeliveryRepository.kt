@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface DeliveryRepository : JpaRepository<Delivery, Long> {
-    fun findByResidentId(residentId: Long): List<Delivery>?
+    fun findByApartmentNumber(apartmentNumber: String): List<Delivery>?
     fun findByTrackingCode(trackingCode: String): Delivery?
     fun findByDoormanId(doormanId: Long): List<Delivery>?
 }

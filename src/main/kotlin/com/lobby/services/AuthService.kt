@@ -1,5 +1,6 @@
 package com.lobby.services
 
+import com.lobby.annotations.CurrentUser
 import com.lobby.dto.SignInDto
 import com.lobby.dto.SignUpDto
 import com.lobby.enums.AccountStatus
@@ -31,7 +32,6 @@ class AuthService(
     @Value("\${config.sign.lockout-minutes}") private val LOCKOUT_MINUTES: Long
 ) {
 
-    // Função auxiliar para verificar duplicidade
     private fun checkDuplicate(value: Any?, message: String): ResponseEntity<Any>? {
         return if (value != null) ResponseEntity.status(HttpStatus.CONFLICT)
             .body(mapOf("success" to false, "message" to message)) else null
@@ -83,13 +83,14 @@ class AuthService(
         }
 
         val user = User(
-            role = request.role,
             cpf = cleanedCpf,
             fullName = request.fullName,
             username = request.username,
             email = request.email,
             phone = request.phone,
             hashedPassword = bcrypt.encodePassword(request.password),
+            role = request.role,
+            apartmentNumber = request.apartmentNumber,
             accountStatus = accountStatus
         )
 
@@ -104,32 +105,6 @@ class AuthService(
                 .body(mapOf("success" to false, "message" to "Usuário ou senha incorretos."))
 
         val now = LocalDateTime.now()
-
-        if (user.accountStatus == AccountStatus.PENDING) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                mapOf("success" to false, "message" to "A conta ainda não foi aprovada.")
-            )
-        }
-
-        if (user.banned && user.banExpiresAt?.isAfter(now) == true) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                mapOf("success" to false, "message" to "Conta temporariamente bloqueada.")
-            )
-        }
-
-        if (user.banned && user.banExpiresAt?.isBefore(now) == true) {
-            user.banned = false
-            user.bannedAt = null
-            user.banExpiresAt = null
-            user.failedLoginAttempts = 0
-            accountRepository.save(user)
-        }
-
-        if (user.banned && user.banExpiresAt == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                mapOf("success" to false, "message" to "Conta permanentemente bloqueada.")
-            )
-        }
 
         if (!bcrypt.checkPassword(request.password, user.hashedPassword)) {
             user.failedLoginAttempts += 1
@@ -157,24 +132,11 @@ class AuthService(
         return ResponseEntity.ok(mapOf("success" to true, "token" to token))
     }
 
-    fun getMe(): ResponseEntity<Any> {
-        val principal = SecurityContextHolder.getContext().authentication?.principal
-        if (principal !is CustomUserDetails) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(mapOf("success" to false, "message" to "Token inválido ou expirado."))
-        }
-        val userDto = principal.user.toResponseDTO()
-        return ResponseEntity.ok(mapOf("success" to true, "user" to userDto))
+    fun getMe(user: User): ResponseEntity<Any> {
+        return ResponseEntity.ok(mapOf("success" to true, "user" to user.toResponseDTO()))
     }
 
-    fun logout(): ResponseEntity<Any> {
-        val principal = SecurityContextHolder.getContext().authentication?.principal
-        if (principal !is CustomUserDetails) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(mapOf("success" to false, "message" to "Token inválido ou expirado."))
-        }
-
-        val user = principal.user
+    fun logout(user: User): ResponseEntity<Any> {
         user.tokenVersion += 1
         accountRepository.save(user)
         SecurityContextHolder.clearContext()

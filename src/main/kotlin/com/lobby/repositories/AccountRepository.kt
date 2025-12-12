@@ -12,4 +12,5 @@ interface AccountRepository : JpaRepository<User, Long> {
     fun findByPhone(phone: String): User?
     fun findByBanned(banned: Boolean): List<User>?
     fun findByAccountStatus(accountStatus: AccountStatus): List<User>?
+    fun findByApartmentNumber(apartmentNumber: String): List<User>?
 }

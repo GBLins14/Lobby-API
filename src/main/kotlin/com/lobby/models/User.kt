@@ -31,6 +31,8 @@ data class User(
     @Column(nullable = false, unique = true)
     var phone: String,
 
+    var apartmentNumber: String? = null,
+
     @JsonIgnore
     @Column(nullable = false)
     var hashedPassword: String?,
@@ -39,7 +41,6 @@ data class User(
     @Enumerated(EnumType.STRING)
     var role: Role = Role.RESIDENT,
 
-    var apartmentNumber: Int? = null,
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -65,4 +66,13 @@ data class User(
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     var updatedAt: LocalDateTime = LocalDateTime.now()
-)
+) {
+    @PrePersist
+    @PreUpdate
+    fun formatData() {
+        this.fullName = this.fullName?.uppercase()
+        this.username = this.username.lowercase()
+        this.email = this.email.lowercase()
+        this.apartmentNumber = this.apartmentNumber?.uppercase()?.replace(Regex("[^A-Z0-9]"), "")
+    }
+}

@@ -1,5 +1,7 @@
 package com.lobby.dto
 
+import com.lobby.enums.AccountStatus
+
 data class UserResponse(
     val id: Long,
     val profileImageUrl: String?,
@@ -9,5 +11,6 @@ data class UserResponse(
     val email: String,
     val phone: String,
     val role: String,
-    val apartmentNumber: Int?
+    val apartmentNumber: String?,
+    val accountStatus: AccountStatus
 )

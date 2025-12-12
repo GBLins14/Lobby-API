@@ -1,5 +1,6 @@
 package com.lobby.dto
 
 data class CreateDeliveryDto(
-    val residentId: Long
+    val recipientName: String,
+    val apartmentNumber: String? = null,
 )

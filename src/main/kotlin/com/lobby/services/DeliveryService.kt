@@ -1,7 +1,6 @@
 package com.lobby.services
 
 import com.lobby.dto.toResponse
-import com.lobby.repositories.AccountRepository
 import com.lobby.repositories.DeliveryRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -9,19 +8,19 @@ import org.springframework.stereotype.Service
 
 @Service
 class DeliveryService(
-    private val deliveryRepository: DeliveryRepository,
-    private val accountRepository: AccountRepository
+    private val deliveryRepository: DeliveryRepository
 ) {
-    fun listMyDeliveries(username: String): ResponseEntity<Any> {
-        val user = accountRepository.findByUsername(username)
-            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
-
-        val deliveries = deliveryRepository.findByResidentId(user.id)
-
-        if (deliveries.isNullOrEmpty()) {
+    fun listMyDeliveries(apartmentNumber: String?): ResponseEntity<Any> {
+        if (apartmentNumber == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(mapOf("success" to false, "message" to "Nenhuma encomenda encontrada."))
         }
+
+        val apartmentNumber = apartmentNumber.uppercase().replace(Regex("[^A-Z0-9]"), "")
+
+        val deliveries = deliveryRepository.findByApartmentNumber(apartmentNumber)
+            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(mapOf("success" to false, "message" to "Nenhuma encomenda encontrada."))
 
         val response = deliveries.map { it.toResponse() }
 

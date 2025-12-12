@@ -22,29 +22,35 @@ class DoormanService(
         val doorman = accountRepository.findByUsername(doormanUsername)
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
 
-        val resident = accountRepository.findById(request.residentId).orElse(null)
-            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(mapOf("success" to false, "message" to "Morador não encontrado"))
+        val apartmentNumber = request.apartmentNumber?.uppercase()?.replace(Regex("[^A-Z0-9]"), "")
+
+        val residents = apartmentNumber?.let { apt ->
+            accountRepository.findByApartmentNumber(apt)
+        } ?: emptyList()
 
         val trackingCode = generateTrackingCode()
 
         val delivery = Delivery(
             trackingCode = trackingCode,
-            resident = resident,
+            recipientName = request.recipientName,
+            apartmentNumber = apartmentNumber,
             doorman = doorman,
             status = DeliveryStatus.WAITING_PICKUP
         )
 
         deliveryRepository.save(delivery)
 
-        try {
-            notificationService.sendArrivalNotification(
-                email = resident.email,
-                residentName = resident.fullName ?: "Morador",
-                trackingCode = delivery.trackingCode
-            )
-        } catch (e: Exception) {
-            println("Erro ao enviar e-mail: ${e.message}")
+        residents.forEach { resident ->
+            try {
+                notificationService.sendArrivalNotification(
+                    recipientName = request.recipientName,
+                    email = resident.email,
+                    residentName = resident.fullName ?: "Morador",
+                    trackingCode = delivery.trackingCode
+                )
+            } catch (e: Exception) {
+                println("Erro ao notificar ${resident.email}: ${e.message}")
+            }
         }
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -56,7 +62,7 @@ class DoormanService(
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(mapOf("success" to false, "message" to "Encomenda não encontrada."))
 
-        return ResponseEntity.ok(mapOf("success" to true, "message" to delivery.toResponse()))
+        return ResponseEntity.ok(mapOf("success" to true, "delivery" to delivery.toResponse()))
     }
 
     fun confirmDelivery(code: String): ResponseEntity<Any> {

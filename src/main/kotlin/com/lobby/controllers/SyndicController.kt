@@ -22,19 +22,14 @@ class SyndicController(
         return syndicService.getPendingAccounts()
     }
 
-    @PatchMapping("/accounts/approve/{login}")
-    fun approveAccount(@PathVariable login: String): ResponseEntity<Any> {
-        return syndicService.approveAccount(login)
+    @PatchMapping("/accounts/approve/{accountId}")
+    fun approveAccount(@PathVariable accountId: Long): ResponseEntity<Any> {
+        return syndicService.approveAccount(accountId)
     }
 
-    @GetMapping("/accounts/{login}")
-    fun getAccount(@PathVariable login: String): ResponseEntity<Any> {
-        return syndicService.getAccountByLogin(login)
-    }
-
-    @PatchMapping("/accounts/role")
-    fun setRole(@RequestBody request: SetRoleDto): ResponseEntity<Any> {
-        return syndicService.updateRole(request)
+    @GetMapping("/accounts/{accountId}")
+    fun getAccount(@PathVariable accountId: Long): ResponseEntity<Any> {
+        return syndicService.getAccountByLogin(accountId)
     }
 
     @GetMapping("/roles")
@@ -42,14 +37,19 @@ class SyndicController(
         return syndicService.getAllRoles()
     }
 
+    @PatchMapping("/accounts/role")
+    fun setRole(@RequestBody request: SetRoleDto): ResponseEntity<Any> {
+        return syndicService.updateRole(request)
+    }
+
     @PatchMapping("/accounts/ban")
     fun banAccount(@RequestBody request: BanDto): ResponseEntity<Any> {
         return syndicService.banAccount(request)
     }
 
-    @PatchMapping("/accounts/unban/{login}")
-    fun unbanAccount(@PathVariable login: String): ResponseEntity<Any> {
-        return syndicService.unbanAccount(login)
+    @PatchMapping("/accounts/unban/{accountId}")
+    fun unbanAccount(@PathVariable accountId: Long): ResponseEntity<Any> {
+        return syndicService.unbanAccount(accountId)
     }
 
     @GetMapping("/accounts/bans")
@@ -57,8 +57,8 @@ class SyndicController(
         return syndicService.getBannedAccounts()
     }
 
-    @DeleteMapping("/accounts/{login}")
-    fun delAccount(@PathVariable login: String): ResponseEntity<Any> {
-        return syndicService.deleteAccount(login)
+    @DeleteMapping("/accounts/{accountId}")
+    fun delAccount(@PathVariable accountId: Long): ResponseEntity<Any> {
+        return syndicService.deleteAccount(accountId)
     }
 }

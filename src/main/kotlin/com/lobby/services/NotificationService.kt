@@ -10,16 +10,14 @@ class NotificationService(
     private val mailSender: JavaMailSender
 ) {
 
-    fun sendArrivalNotification(email: String, residentName: String, trackingCode: String) {
-        // Criamos uma mensagem MIME (que suporta HTML e Imagens)
+    fun sendArrivalNotification(recipientName: String, email: String, residentName: String, trackingCode: String) {
         val message: MimeMessage = mailSender.createMimeMessage()
 
-        // O "true" aqui indica que é multipart (suporta anexos/html)
         val helper = MimeMessageHelper(message, true, "UTF-8")
 
         helper.setFrom("no-reply@lobby.com")
         helper.setTo(email)
-        helper.setSubject("📦 Lobby: A sua encomenda chegou!")
+        helper.setSubject("📦 Lobby: chegou uma encomenda para: $recipientName!")
 
         val htmlContent = """
             <!DOCTYPE html>
@@ -49,7 +47,7 @@ class NotificationService(
                     <div class="content">
                         <h1>Olá, $residentName!</h1>
                         
-                        <p>Temos boas notícias. Uma nova encomenda acabou de chegar à portaria para você.</p>
+                        <p>Temos boas notícias. Uma nova encomenda acabou de chegar à portaria para: $recipientName.</p>
 
                         <p>Para retirar, informe o código abaixo ao porteiro:</p>
 
@@ -57,7 +55,7 @@ class NotificationService(
                             $trackingCode
                         </div>
 
-                        <p class="highlight">A portaria está a sua espera!</p>
+                        <p class="highlight">A portaria está a espera!</p>
                     </div>
 
                     <div class="footer">
@@ -69,7 +67,6 @@ class NotificationService(
             </html>
         """.trimIndent()
 
-        // O "true" indica que o texto é HTML
         helper.setText(htmlContent, true)
 
         mailSender.send(message)

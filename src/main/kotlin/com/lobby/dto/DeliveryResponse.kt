@@ -7,16 +7,18 @@ import java.time.LocalDateTime
 data class DeliveryResponseDto(
     val id: Long,
     val status: DeliveryStatus,
-    val residentId: Long, // <--- AQUI VAI SÓ O ID
-    val doormanId: Long,  // <--- AQUI VAI SÓ O ID
+    val recipientName: String,
+    val apartmentNumber: String?,
+    val doormanId: Long,
     val arrivalDate: LocalDateTime
 )
 fun Delivery.toResponse(): DeliveryResponseDto {
     return DeliveryResponseDto(
         id = this.id,
         status = this.status,
-        residentId = this.resident.id, // Extrai só o ID do objeto User
-        doormanId = this.doorman.id,   // Extrai só o ID do objeto User
+        recipientName = this.recipientName,
+        apartmentNumber = this.apartmentNumber,
+        doormanId = this.doorman.id,
         arrivalDate = this.arrivalDate
     )
 }

@@ -20,10 +20,8 @@ class ValidatorService {
         val cleanedCpf = cleanCpf(cpf)
         if (!cpfRegex.matches(cleanedCpf)) return false
 
-        // Check for known invalid CPFs
         if (cleanedCpf.all { it == cleanedCpf[0] }) return false
 
-        // Validate CPF digits
         try {
             var d1 = 0
             var d2 = 0

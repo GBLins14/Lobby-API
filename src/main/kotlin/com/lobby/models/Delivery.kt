@@ -10,6 +10,8 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.PrePersist
+import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
 import org.hibernate.annotations.CreationTimestamp
 import java.time.LocalDateTime
@@ -23,15 +25,16 @@ data class Delivery(
     val id: Long = 0,
 
     @Column(nullable = false)
-    val trackingCode: String, // Código de rastreio ou "IFOOD-123"
+    val trackingCode: String,
 
-    @ManyToOne
-    @JoinColumn(name = "resident_id", nullable = false)
-    val resident: User, // Quem recebe (Morador)
+    @Column(nullable = false)
+    val recipientName: String,
+
+    var apartmentNumber: String? = null,
 
     @ManyToOne
     @JoinColumn(name = "doorman_id", nullable = false)
-    val doorman: User, // Quem recebeu na portaria (Porteiro)
+    val doorman: User,
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -42,4 +45,11 @@ data class Delivery(
     val arrivalDate: LocalDateTime = LocalDateTime.now(),
 
     var withdrawalDate: LocalDateTime? = null
-)
+) {
+    @PrePersist
+    @PreUpdate
+    fun formatData() {
+        this.apartmentNumber = this.apartmentNumber?.uppercase()?.replace(Regex("[^A-Z0-9]"), "")
+    }
+}
+
