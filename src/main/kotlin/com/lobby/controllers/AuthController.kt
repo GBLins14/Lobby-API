@@ -7,6 +7,7 @@ import com.lobby.models.CustomUserDetails
 import com.lobby.models.User
 import com.lobby.services.AuthService
 import com.lobby.services.SyndicService
+import io.swagger.v3.oas.annotations.security.SecurityRequirements
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -25,11 +26,13 @@ class AuthController(
     private val authService: AuthService,
 ) {
     @PostMapping("/sign-up")
+    @SecurityRequirements
     fun signUp(@RequestBody request: SignUpDto): ResponseEntity<Any> {
         return authService.register(request)
     }
 
     @PostMapping("/sign-in")
+    @SecurityRequirements
     fun signIn(@RequestBody request: SignInDto): ResponseEntity<Any> {
         return authService.login(request)
     }
