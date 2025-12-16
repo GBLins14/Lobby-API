@@ -41,7 +41,6 @@ data class User(
     @Enumerated(EnumType.STRING)
     var role: Role = Role.RESIDENT,
 
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     var accountStatus: AccountStatus,

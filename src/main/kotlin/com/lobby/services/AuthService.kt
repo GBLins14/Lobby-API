@@ -1,35 +1,42 @@
 package com.lobby.services
 
-import com.lobby.annotations.CurrentUser
 import com.lobby.dto.SignInDto
 import com.lobby.dto.SignUpDto
 import com.lobby.enums.AccountStatus
 import com.lobby.enums.Role
 import com.lobby.extensions.toResponseDTO
-import com.lobby.models.CustomUserDetails
 import com.lobby.models.User
+import com.lobby.models.PasswordResetToken
 import com.lobby.repositories.AccountRepository
+import com.lobby.repositories.TokenRepository
 import com.lobby.security.Hash
 import com.lobby.security.JwtUtil
+import com.lobby.utils.generateToken
+import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
+import org.slf4j.LoggerFactory
 
 @Service
 class AuthService(
     private val accountRepository: AccountRepository,
+    private val tokenRepository: TokenRepository,
     private val jwtUtil: JwtUtil,
     private val bcrypt: Hash,
     private val validatorUtil: ValidatorService,
-    @Value("\${config.sign.min-username-length}") private val MIN_USERNAME_LENGTH: Int,
-    @Value("\${config.sign.max-username-length}") private val MAX_USERNAME_LENGTH: Int,
-    @Value("\${config.sign.min-password-length}") private val MIN_PASSWORD_LENGTH: Int,
-    @Value("\${config.sign.max-password-length}") private val MAX_PASSWORD_LENGTH: Int,
-    @Value("\${config.sign.max-attempts}") private val MAX_ATTEMPTS: Int,
-    @Value("\${config.sign.lockout-minutes}") private val LOCKOUT_MINUTES: Long
+    private val forgotPasswordService: ForgotPasswordService,
+    @Value("\${app.frontend-url}") private val FRONTEND_URL: String,
+    @Value("\${app.password-recovery.token-expiration-minutes}") private val TOKEN_EXPIRATION_MINUTES: Long,
+    @Value("\${app.sign.min-username-length}") private val MIN_USERNAME_LENGTH: Int,
+    @Value("\${app.sign.max-username-length}") private val MAX_USERNAME_LENGTH: Int,
+    @Value("\${app.sign.min-password-length}") private val MIN_PASSWORD_LENGTH: Int,
+    @Value("\${app.sign.max-password-length}") private val MAX_PASSWORD_LENGTH: Int,
+    @Value("\${app.sign.max-attempts}") private val MAX_ATTEMPTS: Int,
+    @Value("\${app.sign.lockout-minutes}") private val LOCKOUT_MINUTES: Long
 ) {
 
     private fun checkDuplicate(value: Any?, message: String): ResponseEntity<Any>? {
@@ -130,6 +137,69 @@ class AuthService(
         val token = jwtUtil.generateToken(user.username, user.tokenVersion)
 
         return ResponseEntity.ok(mapOf("success" to true, "token" to token))
+    }
+
+    private val logger = LoggerFactory.getLogger(AuthService::class.java)
+
+    @Transactional
+    fun processForgotPassword(email: String) {
+        val user = accountRepository.findByEmail(email) ?: return
+
+        tokenRepository.deleteByUser(user)
+        tokenRepository.flush()
+
+        val rawToken = generateToken()
+
+        val tokenEntity = PasswordResetToken(
+            token = rawToken,
+            user = user,
+            expiryDate = LocalDateTime.now().plusMinutes(TOKEN_EXPIRATION_MINUTES)
+        )
+        tokenRepository.save(tokenEntity)
+
+        val link = "$FRONTEND_URL/forgot-password?token=$rawToken"
+
+        try {
+            forgotPasswordService.send(email, user.username, link)
+        } catch (e: Exception) {
+            logger.error("Falha ao enviar email de recuperação para $email", e)
+        }
+    }
+
+    @Transactional
+    fun processResetPassword(token: String, newPassword: String): ResponseEntity<Any> {
+        val resetToken = tokenRepository.findByToken(token)
+            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(mapOf("success" to false, "message" to "Token inválido ou não encontrado."))
+
+        if (resetToken.isExpired()) {
+            tokenRepository.delete(resetToken)
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(mapOf(
+                "success" to false,
+                "message" to "Este link expirou. Solicite uma nova recuperação."
+            ))
+        }
+
+        if (newPassword.length !in MIN_PASSWORD_LENGTH..MAX_PASSWORD_LENGTH) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf(
+                "success" to false,
+                "message" to "A senha deve conter no mínimo $MIN_PASSWORD_LENGTH caracteres, e no máximo $MAX_PASSWORD_LENGTH caracteres."
+            ))
+        }
+
+        val user = resetToken.user
+
+        user.hashedPassword = bcrypt.encodePassword(newPassword)
+
+        accountRepository.save(user)
+        tokenRepository.delete(resetToken)
+
+        return ResponseEntity.ok(
+            mapOf(
+                "success" to true,
+                "message" to "Sua senha foi alterada com sucesso! Você já pode fazer login."
+            )
+        )
     }
 
     fun getMe(user: User): ResponseEntity<Any> {

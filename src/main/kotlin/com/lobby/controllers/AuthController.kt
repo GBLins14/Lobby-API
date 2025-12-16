@@ -1,6 +1,8 @@
 package com.lobby.controllers
 
 import com.lobby.annotations.CurrentUser
+import com.lobby.dto.ForgotPasswordRequest
+import com.lobby.dto.ResetPasswordRequest
 import com.lobby.dto.SignInDto
 import com.lobby.dto.SignUpDto
 import com.lobby.models.CustomUserDetails
@@ -35,6 +37,24 @@ class AuthController(
     @SecurityRequirements
     fun signIn(@RequestBody request: SignInDto): ResponseEntity<Any> {
         return authService.login(request)
+    }
+
+    @PostMapping("/forgot-password")
+    @SecurityRequirements
+    fun forgotPassword(@RequestBody request: ForgotPasswordRequest): ResponseEntity<Any> {
+        authService.processForgotPassword(request.email)
+
+        return ResponseEntity.ok(
+            mapOf(
+                "success" to true,
+                "message" to "Se o e-mail estiver cadastrado, você receberá um link de recuperação."
+            )
+        )
+    }
+
+    @PostMapping("/reset-password")
+    fun resetPassword(@RequestBody request: ResetPasswordRequest): ResponseEntity<Any> {
+        return authService.processResetPassword(request.token, request.newPassword)
     }
 
     @PostMapping("/logout")

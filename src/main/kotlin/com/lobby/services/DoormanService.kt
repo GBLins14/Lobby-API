@@ -6,7 +6,8 @@ import com.lobby.enums.DeliveryStatus
 import com.lobby.models.Delivery
 import com.lobby.repositories.AccountRepository
 import com.lobby.repositories.DeliveryRepository
-import com.lobby.utils.generateTrackingCode
+import com.lobby.utils.generateCode
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -18,6 +19,8 @@ class DoormanService(
     private val accountRepository: AccountRepository,
     private val notificationService: NotificationService
 ) {
+    private val logger = LoggerFactory.getLogger(AuthService::class.java)
+
     fun registerDelivery(request: CreateDeliveryDto, doormanUsername: String): ResponseEntity<Any> {
         val doorman = accountRepository.findByUsername(doormanUsername)
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
@@ -28,7 +31,7 @@ class DoormanService(
             accountRepository.findByApartmentNumber(apt)
         } ?: emptyList()
 
-        val trackingCode = generateTrackingCode()
+        val trackingCode = generateCode()
 
         val delivery = Delivery(
             trackingCode = trackingCode,
@@ -49,7 +52,7 @@ class DoormanService(
                     trackingCode = delivery.trackingCode
                 )
             } catch (e: Exception) {
-                println("Erro ao notificar ${resident.email}: ${e.message}")
+                logger.error("Erro ao notificar ${resident.email}", e)
             }
         }
 
