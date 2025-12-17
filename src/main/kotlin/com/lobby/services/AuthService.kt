@@ -20,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import org.slf4j.LoggerFactory
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 @Service
 class AuthService(
@@ -153,7 +155,7 @@ class AuthService(
         val tokenEntity = PasswordResetToken(
             token = rawToken,
             user = user,
-            expiryDate = LocalDateTime.now().plusMinutes(TOKEN_EXPIRATION_MINUTES)
+            expiryDate = Instant.now().plus(TOKEN_EXPIRATION_MINUTES, ChronoUnit.MINUTES)
         )
         tokenRepository.save(tokenEntity)
 
