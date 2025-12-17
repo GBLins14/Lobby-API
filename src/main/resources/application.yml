@@ -47,9 +47,9 @@ spring:
           ssl:
             enable: false
             trust: "*"
-          timeout: 10000
-          connectiontimeout: 10000
-          writetimeout: 10000
+          timeout: 40000
+          connectiontimeout: 40000
+          writetimeout: 40000
 
 jwt:
   jwt-secret: ${SPRING_JWT_SECRET}
