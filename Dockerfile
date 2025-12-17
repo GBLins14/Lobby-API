@@ -11,13 +11,9 @@ ENV GRADLE_OPTS="-Dorg.gradle.caching=false"
 
 RUN ./gradlew clean build -x test --no-daemon
 
-# --- SEGUNDO ESTÁGIO (RUNTIME) ---
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# ADICIONE ESTA LINHA AQUI 👇
-# libgcc: a lib que está faltando no erro.
-# gcompat: garante compatibilidade extra para binários que esperam glibc (comum no Netty).
 RUN apk add --no-cache libgcc gcompat
 
 COPY --from=builder /app/build/libs/*.jar app.jar
