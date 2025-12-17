@@ -4,6 +4,7 @@ import jakarta.mail.internet.MimeMessage
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
+import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 
 @Service
@@ -11,7 +12,7 @@ class ForgotPasswordService(
     private val mailSender: JavaMailSender,
     @Value("\${app.password-recovery.token-expiration-minutes}") private val TOKEN_EXPIRATION_MINUTES: Long,
 ) {
-
+    @Async
     fun send(email: String, username: String, link: String) {
         val message: MimeMessage = mailSender.createMimeMessage()
 
