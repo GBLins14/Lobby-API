@@ -80,7 +80,6 @@ docker run -p 8080:8080 --env-file .env lobby-api
 ./gradlew bootRun
 ```
 
-🤝 Contribuição
-Projeto desenvolvido como MVP para estudo avançado de arquitetura backend com Kotlin.
+🤝 Projeto desenvolvido como MVP para estudo avançado de arquitetura backend com Kotlin.
 
 <div align="center"> <sub>Desenvolvido por <b>Gabriel Lins</b> 🚀</sub> </div>
