@@ -17,7 +17,7 @@ class ForgotPasswordService(
 
         val helper = MimeMessageHelper(message, true, "UTF-8")
 
-        helper.setFrom("no-reply@lobby.com")
+        helper.setFrom("onboarding@resend.dev")
         helper.setTo(email)
         helper.setSubject("Lobby: Recuperação de senha")
 

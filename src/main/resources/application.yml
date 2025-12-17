@@ -34,18 +34,14 @@ spring:
     port: ${SPRING_MAIL_PORT}
     username: ${SPRING_MAIL_USERNAME}
     password: ${SPRING_MAIL_PASSWORD}
+    protocol: smtps
     properties:
       mail:
         smtp:
-          auth: true
-          starttls:
+          ssl:
             enable: true
-            required: true
-          socks:
-            host: ""
-          connectiontimeout: 15000
-          timeout: 15000
-          writetimeout: 15000
+            trust: "*"
+          timeout: 10000
 
 jwt:
   jwt-secret: ${SPRING_JWT_SECRET}

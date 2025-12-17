@@ -1,7 +1,7 @@
 package com.lobby.models
 
 import jakarta.persistence.*
-import java.time.LocalDateTime
+import java.time.Instant
 import java.util.UUID
 
 @Entity
@@ -19,9 +19,9 @@ class PasswordResetToken(
     val user: User,
 
     @Column(nullable = false)
-    val expiryDate: LocalDateTime
+    val expiryDate: Instant
 ) {
     fun isExpired(): Boolean {
-        return LocalDateTime.now().isAfter(expiryDate)
+        return Instant.now().isAfter(expiryDate)
     }
 }
