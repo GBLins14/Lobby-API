@@ -37,12 +37,12 @@ spring:
     properties:
       mail:
         smtp:
-          auth: true
-          starttls:
+          ssl:
             enable: true
-          connectiontimeout: 15000
-          timeout: 15000
-          writetimeout: 15000
+            trust: "*"
+        connectiontimeout: 10000
+        timeout: 10000
+        writetimeout: 10000
 
 jwt:
   jwt-secret: ${SPRING_JWT_SECRET}
