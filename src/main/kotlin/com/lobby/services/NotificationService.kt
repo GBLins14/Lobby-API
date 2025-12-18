@@ -27,17 +27,17 @@ class NotificationService(
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Sua encomenda chegou!</title>
-        </head>
-        <body style="margin: 0; padding: 0; background-color: #f6f9fc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+            </head>
+        <body style="margin: 0; padding: 0; background-color: #f6f9fc; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-font-smoothing: antialiased;">
             
             <div style="display: none; max-height: 0px; overflow: hidden;">
-                Uma nova encomenda para $recipientName acabou de chegar na portaria. Veja o código de retirada.
+                Uma nova encomenda para $recipientName acabou de chegar na portaria.
             </div>
     
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f6f9fc; padding: 40px 0;">
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f6f9fc;">
                 <tr>
-                    <td align="center">
-                        <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden;">
+                    <td align="center" style="padding: 40px 10px;">
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; margin: 0 auto;">
                             
                             <tr>
                                 <td align="center" style="background-color: #ffffff; padding: 40px 0 20px 0; border-bottom: 1px solid #f0f0f0;">
@@ -49,7 +49,7 @@ class NotificationService(
                             </tr>
     
                             <tr>
-                                <td style="padding: 40px 30px; text-align: center;">
+                                <td align="center" style="padding: 40px 30px; text-align: center;">
                                     <h1 style="color: #1a202c; font-size: 24px; margin: 0 0 20px 0;">Encomenda Recebida!</h1>
                                     
                                     <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
@@ -66,9 +66,14 @@ class NotificationService(
                                         Informe o código abaixo ao porteiro para retirar:
                                     </p>
     
-                                    <div style="background-color: #2d3748; color: #ffffff; font-family: 'Courier New', monospace; font-size: 32px; font-weight: bold; letter-spacing: 4px; padding: 20px; border-radius: 8px; margin: 0 auto 30px auto; width: fit-content; border: 2px solid #4a5568;">
-                                        $trackingCode
-                                    </div>
+                                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
+                                        <tr>
+                                            <td align="center" style="background-color: #2d3748; color: #ffffff; font-family: 'Courier New', monospace; font-size: 32px; font-weight: bold; letter-spacing: 4px; padding: 20px; border-radius: 8px; border: 2px solid #4a5568;">
+                                                $trackingCode
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <div style="height: 30px;"></div>
     
                                     <p style="color: #e53e3e; font-weight: 600; font-size: 14px; background-color: #fff5f5; padding: 10px; border-radius: 6px; display: inline-block;">
                                         ⚠️ A portaria está aguardando a retirada.
@@ -81,7 +86,7 @@ class NotificationService(
                             </tr>
     
                             <tr>
-                                <td style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #f0f0f0;">
+                                <td align="center" style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #f0f0f0;">
                                     <p style="color: #a0aec0; font-size: 12px; margin: 0;">
                                         © 2025 Lobby App - Gestão Inteligente de Condomínios<br>
                                         Não responda a este e-mail automático.
@@ -90,8 +95,7 @@ class NotificationService(
                             </tr>
                         </table>
                         
-                        <div style="height: 40px;"></div>
-                    </td>
+                        </td>
                 </tr>
             </table>
         </body>
