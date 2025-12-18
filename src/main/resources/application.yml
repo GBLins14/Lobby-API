@@ -1,4 +1,5 @@
 app:
+  resend-api-key: ${APP_RESEND_API_KEY}
   frontend-url: ${APP_FRONTEND_URL}
   max-requests-per-minutes: ${APP_MAX_REQUESTS_PER_MINUTES}
 

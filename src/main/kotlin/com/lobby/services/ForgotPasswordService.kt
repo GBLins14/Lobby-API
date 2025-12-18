@@ -1,19 +1,23 @@
 package com.lobby.services
 
-import com.resend.Resend
-import com.resend.core.exception.ResendException
-import com.resend.services.emails.model.SendEmailRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.slf4j.LoggerFactory
+import org.springframework.http.MediaType
+import org.springframework.web.client.RestClient
 
 @Service
 class ForgotPasswordService(
-    private val resend: Resend,
+    @Value("\${app.resend-api-key}") private val apiKey: String,
     @Value("\${app.password-recovery.token-expiration-minutes}") private val TOKEN_EXPIRATION_MINUTES: Long,
 ) {
     private val logger = LoggerFactory.getLogger(ForgotPasswordService::class.java)
+
+    private val restClient = RestClient.builder()
+        .baseUrl("https://api.resend.com")
+        .defaultHeader("Authorization", "Bearer $apiKey")
+        .build()
 
     @Async
     fun send(email: String, username: String, link: String) {
@@ -102,18 +106,27 @@ class ForgotPasswordService(
         </html>
     """.trimIndent()
 
-        val params = SendEmailRequest.builder()
-            .from("Lobby App <onboarding@resend.dev>")
-            .to(email)
-            .subject("Lobby: Recuperação de senha.")
-            .html(htmlContent)
-            .build()
+        val emailRequest = mapOf(
+            "from" to "Lobby App <onboarding@resend.dev>",
+            "to" to listOf(email),
+            "subject" to "Lobby: Recuperação de Senha",
+            "html" to htmlContent
+        )
 
         try {
-            resend.emails().send(params)
-            logger.info("✅ Email enviado para: {}", email)
+            logger.info("Tentando enviar email para: $email via API Spring...")
+
+            val response = restClient.post()
+                .uri("/emails")
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(emailRequest)
+                .retrieve()
+                .toBodilessEntity()
+
+            logger.info("✅ Sucesso! Status Code: ${response.statusCode}")
+
         } catch (e: Exception) {
-            logger.error("❌ Erro ao enviar email: {}", e.message, e)
+            logger.error("❌ Falha crítica ao enviar email via API: ${e.message}", e)
         }
     }
 }
