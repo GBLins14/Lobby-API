@@ -41,9 +41,17 @@ class NotificationService(
                             
                             <tr>
                                 <td align="center" style="background-color: #ffffff; padding: 40px 0 20px 0; border-bottom: 1px solid #f0f0f0;">
-                                    <div style="background-color: #4F46E5; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-                                        <span style="font-size: 28px; line-height: 50px;">📦</span>
+                                    
+                                    <div style="background-color: #C084FC; width: 50px; height: 50px; border-radius: 12px; margin: 0 auto 10px auto;">
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%">
+                                            <tr>
+                                                <td align="center" valign="middle" style="height: 50px;">
+                                                    <span style="font-size: 26px; line-height: 1; display: block;">📦</span>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </div>
+                            
                                     <h2 style="margin: 10px 0 0 0; color: #1a1a1a; font-size: 22px; letter-spacing: -0.5px;">LOBBY APP</h2>
                                 </td>
                             </tr>
@@ -58,7 +66,7 @@ class NotificationService(
                                     </p>
     
                                     <div style="background-color: #eff6ff; border: 1px dashed #bfdbfe; border-radius: 8px; padding: 15px; display: inline-block; margin-bottom: 25px;">
-                                        <span style="color: #1e40af; font-weight: 600; font-size: 14px;">Destinatário:</span><br>
+                                        <span style="color: #1e40af; font-weight: 600; font-size: 14px; padding-bottom: 5px;">Destinatário:</span><br>
                                         <span style="color: #1e3a8a; font-size: 18px; font-weight: bold;">$recipientName</span>
                                     </div>
     

@@ -42,9 +42,17 @@ class ForgotPasswordService(
                             
                             <tr>
                                 <td align="center" style="background-color: #ffffff; padding: 40px 0 20px 0; border-bottom: 1px solid #f0f0f0;">
-                                    <div style="background-color: #4F46E5; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
-                                        <span style="font-size: 26px; line-height: 50px;">🔐</span>
+                                    
+                                    <div style="background-color: #C084FC; width: 50px; height: 50px; border-radius: 12px; margin: 0 auto 10px auto;">
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%">
+                                            <tr>
+                                                <td align="center" valign="middle" style="height: 50px;">
+                                                    <span style="font-size: 26px; line-height: 1; display: block;">🔐</span>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </div>
+                            
                                     <h2 style="margin: 10px 0 0 0; color: #1a1a1a; font-size: 22px; letter-spacing: -0.5px;">LOBBY APP</h2>
                                 </td>
                             </tr>
@@ -61,7 +69,7 @@ class ForgotPasswordService(
                                     <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 30px 0;">
                                         <tr>
                                             <td align="center">
-                                                <a href="$link" target="_blank" style="background-color: #4F46E5; color: #ffffff; font-size: 16px; font-weight: 600; padding: 14px 32px; border-radius: 8px; text-decoration: none; display: inline-block; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);">
+                                                <a href="$link" target="_blank" style="background-color: #C084FC; color: #ffffff; font-size: 16px; font-weight: 600; padding: 14px 32px; border-radius: 8px; text-decoration: none; display: inline-block; box-shadow: 0 4px 6px rgba(79, 70, 229, 0.2);">
                                                     Redefinir Minha Senha
                                                 </a>
                                             </td>
@@ -82,7 +90,7 @@ class ForgotPasswordService(
                                     <div style="border-top: 1px solid #edf2f7; padding-top: 20px; text-align: center;">
                                         <p style="color: #a0aec0; font-size: 12px; margin-bottom: 10px;">Problemas com o botão? Copie o link abaixo:</p>
                                         <p style="word-break: break-all; margin: 0;">
-                                            <a href="$link" style="color: #4F46E5; font-size: 12px; text-decoration: none;">$link</a>
+                                            <a href="$link" style="color: #C084FC; font-size: 12px; text-decoration: none;">$link</a>
                                         </p>
                                     </div>
                                 </td>
