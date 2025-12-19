@@ -87,8 +87,7 @@ class AuthService(
         val accountStatus = when (request.role) {
             Role.DOORMAN -> AccountStatus.PENDING
             Role.RESIDENT -> AccountStatus.APPROVED
-            else -> return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(mapOf("success" to false, "message" to "Para se registrar como síndico, é necessario ter permissão."))
+            else -> AccountStatus.PENDING
         }
 
         val user = User(
@@ -131,6 +130,11 @@ class AuthService(
             accountRepository.save(user)
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(mapOf("success" to false, "message" to "Usuário ou senha incorretos."))
+        }
+
+        if (user.accountStatus == AccountStatus.PENDING) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(mapOf("success" to false, "message" to "A sua conta ainda não foi aprovada, aguarde a liberação."))
         }
 
         user.failedLoginAttempts = 0

@@ -42,7 +42,7 @@ class JwtAuthenticationFilter(
                 }
 
                 if (user.accountStatus == AccountStatus.PENDING) {
-                    if (unauthorized(response, "A conta ainda não foi aprovada.")) return
+                    if (unauthorized(response, "A sua conta ainda não foi aprovada, aguarde a liberação.")) return
                 }
 
                 if (user.banned) {
