@@ -10,7 +10,8 @@ data class DeliveryResponseDto(
     val recipientName: String,
     val apartmentNumber: String?,
     val doormanId: Long,
-    val arrivalDate: Instant
+    val arrivalDate: Instant,
+    val withdrawalDate: Instant?
 )
 fun Delivery.toResponse(): DeliveryResponseDto {
     return DeliveryResponseDto(
@@ -19,6 +20,7 @@ fun Delivery.toResponse(): DeliveryResponseDto {
         recipientName = this.recipientName,
         apartmentNumber = this.apartmentNumber,
         doormanId = this.doorman.id,
-        arrivalDate = this.arrivalDate
+        arrivalDate = this.arrivalDate,
+        withdrawalDate = this.withdrawalDate
     )
 }

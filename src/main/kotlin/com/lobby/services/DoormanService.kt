@@ -38,8 +38,7 @@ class DoormanService(
             recipientName = request.recipientName,
             apartmentNumber = apartmentNumber,
             doorman = doorman,
-            status = DeliveryStatus.WAITING_PICKUP,
-            arrivalDate = Instant.now()
+            status = DeliveryStatus.WAITING_PICKUP
         )
 
         deliveryRepository.save(delivery)

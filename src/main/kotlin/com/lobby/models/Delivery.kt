@@ -39,7 +39,7 @@ data class Delivery(
     var status: DeliveryStatus = DeliveryStatus.WAITING_PICKUP,
 
     @Column(nullable = false, updatable = false)
-    val arrivalDate: Instant,
+    val arrivalDate: Instant = Instant.now(),
 
     var withdrawalDate: Instant? = null
 ) {

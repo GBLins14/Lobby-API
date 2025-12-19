@@ -41,7 +41,10 @@ class SecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
 
-        configuration.allowedOriginPatterns = listOf("*")
+        configuration.allowedOrigins = listOf(
+            FRONTEND_URL,
+            SWAGGER_URL
+        )
 
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD")
         configuration.allowedHeaders = listOf("*")

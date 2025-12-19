@@ -139,7 +139,7 @@ class AuthService(
         user.failedLoginAttempts = 0
         accountRepository.save(user)
 
-        val token = jwtUtil.generateToken(user.username, user.tokenVersion)
+        val token = jwtUtil.generateToken(user.username, user.role, user.tokenVersion)
 
         return ResponseEntity.ok(mapOf("success" to true, "token" to token))
     }

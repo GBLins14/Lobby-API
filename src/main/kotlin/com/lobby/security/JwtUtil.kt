@@ -1,5 +1,6 @@
 package com.lobby.security
 
+import com.lobby.enums.Role
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
@@ -11,16 +12,16 @@ class JwtUtil(
     @Value("\${jwt.jwt-secret}") private val secret: String,
     @Value("\${jwt.jwt-expiration-ms}") private val expirationMs: Long
 ) {
-
     private val key = Keys.hmacShaKeyFor(secret.toByteArray())
 
-    fun generateToken(username: String, tokenVersion: Int): String {
+    fun generateToken(username: String, role: Role, tokenVersion: Int): String {
         val now = Date()
         val expiry = Date(now.time + expirationMs)
 
         return Jwts.builder()
             .setSubject(username)
             .claim("tokenVersion", tokenVersion)
+            .claim("role", role)
             .setIssuedAt(now)
             .setExpiration(expiry)
             .signWith(key)
@@ -44,5 +45,10 @@ class JwtUtil(
     fun getTokenVersion(token: String): Int {
         val claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).body
         return claims["tokenVersion"] as Int
+    }
+
+    fun getRole(token: String): String {
+        val claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).body
+        return claims["role"] as String
     }
 }
