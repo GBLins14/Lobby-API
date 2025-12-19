@@ -6,6 +6,7 @@ import com.lobby.enums.AccountStatus
 import com.lobby.enums.Role
 import com.lobby.models.CustomUserDetails
 import com.lobby.repositories.AccountRepository
+import com.lobby.repositories.DeliveryRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -15,8 +16,15 @@ import java.time.Instant
 
 @Service
 class SyndicService(
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val deliveryRepository: DeliveryRepository
 ) {
+    fun getAllDeliveries(): ResponseEntity<Any> {
+        val deliveries = deliveryRepository.findAll()
+
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(mapOf("success" to true, "deliveries" to deliveries))
+    }
 
     fun getAllAccounts(): ResponseEntity<Any> {
         val accounts = accountRepository.findAll()

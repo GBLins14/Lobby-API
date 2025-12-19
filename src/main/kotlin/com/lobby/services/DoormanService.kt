@@ -21,6 +21,13 @@ class DoormanService(
 ) {
     private val logger = LoggerFactory.getLogger(AuthService::class.java)
 
+    fun getAllDeliveries(): ResponseEntity<Any> {
+        val deliveries = deliveryRepository.findAll()
+
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(mapOf("success" to true, "deliveries" to deliveries))
+    }
+
     fun registerDelivery(request: CreateDeliveryDto, doormanUsername: String): ResponseEntity<Any> {
         val doorman = accountRepository.findByUsername(doormanUsername)
             ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()

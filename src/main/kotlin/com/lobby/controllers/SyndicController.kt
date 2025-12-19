@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.*
 class SyndicController(
     private val syndicService: SyndicService,
 ) {
-    // Adicionar rota de ver todas as encomendas.
+    @GetMapping
+    fun getAllDeliveries(): ResponseEntity<Any> {
+        return syndicService.getAllDeliveries()
+    }
 
     @GetMapping("/accounts")
     fun getAccounts(): ResponseEntity<Any> {

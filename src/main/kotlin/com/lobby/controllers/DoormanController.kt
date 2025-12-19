@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.*
 class DoormanController(
     private val doormanService: DoormanService
 ) {
-    // Adicionar rota de ver todas as encomendas.
+    @GetMapping
+    fun getAllDeliveries(): ResponseEntity<Any> {
+        return doormanService.getAllDeliveries()
+    }
 
     @PostMapping
     fun create(
