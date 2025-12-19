@@ -2,7 +2,7 @@ package com.lobby.dto
 
 import com.lobby.enums.DeliveryStatus
 import com.lobby.models.Delivery
-import java.time.LocalDateTime
+import java.time.Instant
 
 data class DeliveryResponseDto(
     val id: Long,
@@ -10,7 +10,7 @@ data class DeliveryResponseDto(
     val recipientName: String,
     val apartmentNumber: String?,
     val doormanId: Long,
-    val arrivalDate: LocalDateTime
+    val arrivalDate: Instant
 )
 fun Delivery.toResponse(): DeliveryResponseDto {
     return DeliveryResponseDto(

@@ -11,7 +11,6 @@ import org.springframework.web.filter.OncePerRequestFilter
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import java.time.LocalDateTime
 
 @Component
 class JwtAuthenticationFilter(
@@ -46,24 +45,23 @@ class JwtAuthenticationFilter(
                 }
 
                 if (user.banned) {
-                    val now = LocalDateTime.now()
-                    val banExpiresAt = user.banExpiresAt
-                        ?: run {
-                            if (unauthorized(response, "Conta permanentemente bloqueada.")) return
-                            return
-                        }
+                    if (user.banExpiresAt == null) {
+                        if (unauthorized(response, "Conta permanentemente bloqueada.")) return
+                        return
+                    }
 
-                    if (banExpiresAt.isAfter(now)) {
+                    if (!user.isBanExpired()) {
                         if (unauthorized(response, "Conta temporariamente bloqueada.")) return
+                        return
                     }
 
-                    if (banExpiresAt.isBefore(now)) {
-                        user.banned = false
-                        user.bannedAt = null
-                        user.banExpiresAt = null
-                        user.failedLoginAttempts = 0
-                        accountRepository.save(user)
+                    user.apply {
+                        banned = false
+                        bannedAt = null
+                        banExpiresAt = null
+                        failedLoginAttempts = 0
                     }
+                    accountRepository.save(user)
                 }
 
                 val authorities = listOf(SimpleGrantedAuthority("ROLE_${user.role.name}"))

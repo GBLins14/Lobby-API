@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Service
 class DoormanService(
@@ -38,7 +38,8 @@ class DoormanService(
             recipientName = request.recipientName,
             apartmentNumber = apartmentNumber,
             doorman = doorman,
-            status = DeliveryStatus.WAITING_PICKUP
+            status = DeliveryStatus.WAITING_PICKUP,
+            arrivalDate = Instant.now()
         )
 
         deliveryRepository.save(delivery)
@@ -79,7 +80,7 @@ class DoormanService(
         }
 
         delivery.status = DeliveryStatus.DELIVERED
-        delivery.withdrawalDate = LocalDateTime.now()
+        delivery.withdrawalDate = Instant.now()
 
         deliveryRepository.save(delivery)
 

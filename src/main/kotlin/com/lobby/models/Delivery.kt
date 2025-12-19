@@ -13,9 +13,7 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
-import org.hibernate.annotations.CreationTimestamp
-import java.time.LocalDateTime
-
+import java.time.Instant
 
 @Entity
 @Table(name = "deliveries")
@@ -40,11 +38,10 @@ data class Delivery(
     @Column(nullable = false)
     var status: DeliveryStatus = DeliveryStatus.WAITING_PICKUP,
 
-    @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    val arrivalDate: LocalDateTime = LocalDateTime.now(),
+    val arrivalDate: Instant,
 
-    var withdrawalDate: LocalDateTime? = null
+    var withdrawalDate: Instant? = null
 ) {
     @PrePersist
     @PreUpdate

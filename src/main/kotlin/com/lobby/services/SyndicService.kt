@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.time.Instant
 
 @Service
 class SyndicService(
@@ -90,7 +90,7 @@ class SyndicService(
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(mapOf("success" to false, "message" to "Conta não encontrada."))
 
-        val now = LocalDateTime.now()
+        val now = Instant.now()
 
         if (request.duration == null || request.unit == null) {
             account.banned = true

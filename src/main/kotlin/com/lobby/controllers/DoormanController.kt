@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*
 class DoormanController(
     private val doormanService: DoormanService
 ) {
+    // Adicionar rota de ver todas as encomendas.
+
     @PostMapping
     fun create(
         @RequestBody request: CreateDeliveryDto,
