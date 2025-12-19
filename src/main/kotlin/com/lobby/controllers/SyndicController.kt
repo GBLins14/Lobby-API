@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 class SyndicController(
     private val syndicService: SyndicService,
 ) {
-    @GetMapping
+    @GetMapping("/deliveries")
     fun getAllDeliveries(): ResponseEntity<Any> {
         return syndicService.getAllDeliveries()
     }
