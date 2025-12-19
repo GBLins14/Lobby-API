@@ -21,7 +21,7 @@ class SyndicService(
     private val deliveryRepository: DeliveryRepository
 ) {
     fun getAllDeliveries(): ResponseEntity<Any> {
-        val deliveries = deliveryRepository.findAll().map { it.toListResponse() }
+        val deliveries = deliveryRepository.findAll()
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(mapOf("success" to true, "deliveries" to deliveries))
@@ -99,6 +99,8 @@ class SyndicService(
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(mapOf("success" to false, "message" to "Conta não encontrada."))
 
+        checkSelfBan(account.id)
+
         val now = Instant.now()
 
         if (request.duration == null || request.unit == null) {
@@ -113,8 +115,6 @@ class SyndicService(
 
         account.tokenVersion += 1
         accountRepository.save(account)
-
-        checkSelfBan(account.id)
 
         val typeMsg = if (request.duration == null) "Permanente" else "${request.duration} ${request.unit}"
         return ResponseEntity.ok(
