@@ -2,6 +2,7 @@ package com.lobby.services
 
 import com.lobby.dto.BanDto
 import com.lobby.dto.SetRoleDto
+import com.lobby.dto.toListResponse
 import com.lobby.enums.AccountStatus
 import com.lobby.enums.Role
 import com.lobby.models.CustomUserDetails
@@ -20,7 +21,7 @@ class SyndicService(
     private val deliveryRepository: DeliveryRepository
 ) {
     fun getAllDeliveries(): ResponseEntity<Any> {
-        val deliveries = deliveryRepository.findAll()
+        val deliveries = deliveryRepository.findAll().map { it.toListResponse() }
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(mapOf("success" to true, "deliveries" to deliveries))

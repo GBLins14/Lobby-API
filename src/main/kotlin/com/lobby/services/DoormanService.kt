@@ -1,6 +1,7 @@
 package com.lobby.services
 
 import com.lobby.dto.CreateDeliveryDto
+import com.lobby.dto.toListResponse
 import com.lobby.dto.toResponse
 import com.lobby.enums.DeliveryStatus
 import com.lobby.models.Delivery
@@ -22,7 +23,7 @@ class DoormanService(
     private val logger = LoggerFactory.getLogger(AuthService::class.java)
 
     fun getAllDeliveries(): ResponseEntity<Any> {
-        val deliveries = deliveryRepository.findAll()
+        val deliveries = deliveryRepository.findAll().map { it.toListResponse() }
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(mapOf("success" to true, "deliveries" to deliveries))
