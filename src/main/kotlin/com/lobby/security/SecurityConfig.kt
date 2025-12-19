@@ -24,7 +24,7 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 it.requestMatchers("/api/auth/**").permitAll()
-                it.requestMatchers("/api/doorman/**").hasRole("DOORMAN")
+                it.requestMatchers("/api/doorman/**").hasAnyRole("DOORMAN", "SYNDIC")
                 it.requestMatchers("/api/syndic/**").hasRole("SYNDIC")
                 it.anyRequest().authenticated()
             }
