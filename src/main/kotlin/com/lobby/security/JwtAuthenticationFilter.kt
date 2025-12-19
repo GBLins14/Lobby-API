@@ -64,7 +64,7 @@ class JwtAuthenticationFilter(
                     accountRepository.save(user)
                 }
 
-                val authorities = listOf(SimpleGrantedAuthority("ROLE_${user.role.name}"))
+                val authorities = listOf(SimpleGrantedAuthority("ROLE_${user.role.name.uppercase()}"))
 
                 val authentication = UsernamePasswordAuthenticationToken(
                     CustomUserDetails(user),
@@ -81,7 +81,8 @@ class JwtAuthenticationFilter(
 
     private fun unauthorized(response: HttpServletResponse, msg: String): Boolean {
         response.status = HttpServletResponse.SC_UNAUTHORIZED
-        response.contentType = "text/plain"
+        response.contentType = "text/plain; charset=UTF-8"
+        response.characterEncoding = "UTF-8"
         response.writer.write(msg)
         return true
     }

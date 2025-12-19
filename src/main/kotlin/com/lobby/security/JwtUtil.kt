@@ -21,7 +21,7 @@ class JwtUtil(
         return Jwts.builder()
             .setSubject(username)
             .claim("tokenVersion", tokenVersion)
-            .claim("role", role)
+            .claim("role", role.name)
             .setIssuedAt(now)
             .setExpiration(expiry)
             .signWith(key)
