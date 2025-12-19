@@ -15,7 +15,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableWebSecurity
 class SecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
-    @Value("\${app.frontend-url}") private val FRONTEND_URL: String
+    @Value("\${app.frontend-url}") private val FRONTEND_URL: String,
+    @Value("\${app.swagger-url}") private val SWAGGER_URL: String
 ) {
 
     @Bean
@@ -41,7 +42,8 @@ class SecurityConfig(
         val configuration = CorsConfiguration()
 
         configuration.allowedOrigins = listOf(
-            FRONTEND_URL
+            FRONTEND_URL,
+            SWAGGER_URL
         )
 
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD")
