@@ -27,6 +27,7 @@ class SecurityConfig(
                 it.requestMatchers("/api/doorman/**").hasAnyRole("DOORMAN", "SYNDIC", "ADMIN")
                 it.requestMatchers("/api/syndic/**").hasAnyRole("SYNDIC", "ADMIN")
                 it.requestMatchers("/api/condominium/**").hasRole("ADMIN")
+                it.requestMatchers("/api/admin/**").hasRole("ADMIN")
                 it.anyRequest().authenticated()
             }
             .formLogin { it.disable() }
