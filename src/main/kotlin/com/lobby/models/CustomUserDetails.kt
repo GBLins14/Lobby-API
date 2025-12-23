@@ -13,4 +13,5 @@ class CustomUserDetails(val user: User) : UserDetails {
     override fun getUsername() = user.username
     override fun getPassword() = user.hashedPassword
     fun getApartment() = user.apartmentNumber
+    fun getCondominium() = user.condominium
 }

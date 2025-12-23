@@ -24,8 +24,9 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 it.requestMatchers("/api/auth/**").permitAll()
-                it.requestMatchers("/api/doorman/**").hasAnyRole("DOORMAN", "SYNDIC")
-                it.requestMatchers("/api/syndic/**").hasRole("SYNDIC")
+                it.requestMatchers("/api/doorman/**").hasAnyRole("DOORMAN", "SYNDIC", "ADMIN")
+                it.requestMatchers("/api/syndic/**").hasAnyRole("SYNDIC", "ADMIN")
+                it.requestMatchers("/api/condominium/**").hasRole("ADMIN")
                 it.anyRequest().authenticated()
             }
             .formLogin { it.disable() }

@@ -8,9 +8,11 @@ data class SignUpDto(
     val username: String,
     val email: String,
     val phone: String,
+    val condominiumCode: String?,
+    val block: String?,
+    val apartmentNumber: String?,
     val password: String,
     val role: Role = Role.RESIDENT,
-    val apartmentNumber: String?
 )
 
 data class SignInDto(

@@ -22,7 +22,11 @@ data class Delivery(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @Column(nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "condominium_id", nullable = false)
+    val condominium: Condominium,
+
+    @Column(nullable = false, unique = true)
     val trackingCode: String,
 
     @Column(nullable = false)

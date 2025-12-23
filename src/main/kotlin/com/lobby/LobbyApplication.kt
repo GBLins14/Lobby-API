@@ -17,15 +17,6 @@ fun main(args: Array<String>) {
         }
     } catch (_: Exception) {
         println("Arquivo .env não encontrado ou erro ao carregar. Usando variáveis de ambiente do sistema.")
-        println("Arquivo .env não encontrado ou erro ao carregar. Usando variáveis de ambiente do sistema.")
-        println("Arquivo .env não encontrado ou erro ao carregar. Usando variáveis de ambiente do sistema.")
-        println("Arquivo .env não encontrado ou erro ao carregar. Usando variáveis de ambiente do sistema.")
-        println("Arquivo .env não encontrado ou erro ao carregar. Usando variáveis de ambiente do sistema.")
-        println("Arquivo .env não encontrado ou erro ao carregar. Usando variáveis de ambiente do sistema.")
-        println("Arquivo .env não encontrado ou erro ao carregar. Usando variáveis de ambiente do sistema.")
-        println("Arquivo .env não encontrado ou erro ao carregar. Usando variáveis de ambiente do sistema.")
-        println("Arquivo .env não encontrado ou erro ao carregar. Usando variáveis de ambiente do sistema.")
-        println("Arquivo .env não encontrado ou erro ao carregar. Usando variáveis de ambiente do sistema.")
     }
 
 	runApplication<LobbyApplication>(*args)

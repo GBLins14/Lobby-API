@@ -3,6 +3,7 @@ package com.lobby.models
 import com.lobby.enums.AccountStatus
 import com.lobby.enums.Role
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.lobby.enums.SubscriptionPlan
 import jakarta.persistence.*
 import java.time.Instant
 
@@ -12,9 +13,6 @@ data class User(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
-
-    @Column(length = 500)
-    var profileImageUrl: String? = null,
 
     @Column(nullable = false, unique = true)
     val cpf: String,
@@ -29,6 +27,15 @@ data class User(
 
     @Column(nullable = false, unique = true)
     var phone: String,
+
+    @Enumerated(EnumType.STRING)
+    var subscriptionPlan: SubscriptionPlan? = null,
+
+    @ManyToOne
+    @JoinColumn(name = "condominium_id")
+    var condominium: Condominium? = null,
+
+    var block: String? = null,
 
     var apartmentNumber: String? = null,
 

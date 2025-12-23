@@ -12,6 +12,10 @@ app:
     max-attempts: ${APP_MAX_ATTEMPTS}
     lockout-minutes: ${APP_LOCKOUT_MINUTES}
 
+  condominium:
+    min-condominium_name_length: ${APP_MIN_CONDOMINIUM_NAME_LENGTH}
+    max-condominium_name_length: ${APP_MAX_CONDOMINIUM_NAME_LENGTH}
+
   password-recovery:
     token-expiration-minutes: ${APP_TOKEN_EXPIRATION_MINUTES}
 

@@ -1,10 +1,11 @@
 package com.lobby.controllers
 
+import com.lobby.annotations.CurrentUser
 import com.lobby.dto.CreateDeliveryDto
+import com.lobby.models.User
 import com.lobby.services.DoormanService
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -13,25 +14,38 @@ class DoormanController(
     private val doormanService: DoormanService
 ) {
     @GetMapping
-    fun getAllDeliveries(): ResponseEntity<Any> {
-        return doormanService.getAllDeliveries()
+    fun getAllDeliveries(@CurrentUser user: User): ResponseEntity<Any> {
+        if (user.condominium == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(mapOf("success" to false, "message" to "Você não está registrado em nenhum condomínio."))
+        }
+        return doormanService.getAllDeliveries(user.condominium!!)
     }
 
     @PostMapping
-    fun create(
-        @RequestBody request: CreateDeliveryDto,
-        @AuthenticationPrincipal userDetails: UserDetails
-    ): ResponseEntity<Any> {
-        return doormanService.registerDelivery(request, userDetails.username)
+    fun create(@RequestBody request: CreateDeliveryDto, @CurrentUser user: User): ResponseEntity<Any> {
+        if (user.condominium == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(mapOf("success" to false, "message" to "Você não está registrado em nenhum condomínio."))
+        }
+        return doormanService.registerDelivery(request, user.condominium!!, user.username)
     }
 
     @GetMapping("/{trackingCode}")
-    fun listTrackingCode(@PathVariable trackingCode: String): ResponseEntity<Any> {
-        return doormanService.getDeliveryByCode(trackingCode)
+    fun listTrackingCode(@CurrentUser user: User, @PathVariable trackingCode: String): ResponseEntity<Any> {
+        if (user.condominium == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(mapOf("success" to false, "message" to "Você não está registrado em nenhum condomínio."))
+        }
+        return doormanService.getDeliveryByCode(user.condominium!!, trackingCode)
     }
 
     @PutMapping("/{trackingCode}/confirm")
-    fun confirmReceipt(@PathVariable trackingCode: String): ResponseEntity<Any> {
-        return doormanService.confirmDelivery(trackingCode)
+    fun confirmReceipt(@CurrentUser user: User, @PathVariable trackingCode: String): ResponseEntity<Any> {
+        if (user.condominium == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(mapOf("success" to false, "message" to "Você não está registrado em nenhum condomínio."))
+        }
+        return doormanService.confirmDelivery(user.condominium!!, trackingCode)
     }
 }

@@ -1,9 +1,9 @@
 package com.lobby.enums
 
 enum class Role {
-    RESIDENT, DOORMAN, SYNDIC
+    RESIDENT, DOORMAN, SYNDIC, ADMIN
 }
 
 enum class AccountStatus {
-    APPROVED, PENDING
+    CREATING, APPROVED, PENDING
 }

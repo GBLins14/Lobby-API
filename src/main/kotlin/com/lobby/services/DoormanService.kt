@@ -4,10 +4,14 @@ import com.lobby.dto.CreateDeliveryDto
 import com.lobby.dto.toListResponse
 import com.lobby.dto.toResponse
 import com.lobby.enums.DeliveryStatus
+import com.lobby.extensions.error
+import com.lobby.extensions.success
+import com.lobby.models.Condominium
 import com.lobby.models.Delivery
 import com.lobby.repositories.AccountRepository
 import com.lobby.repositories.DeliveryRepository
 import com.lobby.utils.generateCode
+import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -22,26 +26,28 @@ class DoormanService(
 ) {
     private val logger = LoggerFactory.getLogger(AuthService::class.java)
 
-    fun getAllDeliveries(): ResponseEntity<Any> {
-        val deliveries = deliveryRepository.findAll().map { it.toListResponse() }
+    fun getAllDeliveries(condominium: Condominium): ResponseEntity<Any> {
+        val deliveries = deliveryRepository.findByCondominium(condominium).map { it.toListResponse() }
 
         return ResponseEntity.status(HttpStatus.OK)
             .body(mapOf("success" to true, "deliveries" to deliveries))
     }
 
-    fun registerDelivery(request: CreateDeliveryDto, doormanUsername: String): ResponseEntity<Any> {
+    @Transactional
+    fun registerDelivery(request: CreateDeliveryDto, condominium: Condominium, doormanUsername: String): ResponseEntity<Any> {
         val doorman = accountRepository.findByUsername(doormanUsername)
-            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Ocorreu um erro com sua conta, tente novamente mais tarde.")
 
         val apartmentNumber = request.apartmentNumber?.uppercase()?.replace(Regex("[^A-Z0-9]"), "")
 
         val residents = apartmentNumber?.let { apt ->
-            accountRepository.findByApartmentNumber(apt)
+            accountRepository.findByCondominiumAndApartmentNumber(condominium, apt)
         } ?: emptyList()
 
         val trackingCode = generateCode()
 
         val delivery = Delivery(
+            condominium = condominium,
             trackingCode = trackingCode,
             recipientName = request.recipientName,
             apartmentNumber = apartmentNumber,
@@ -64,26 +70,23 @@ class DoormanService(
             }
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(mapOf("success" to true, "message" to "Entrega registrada!"))
+        return ResponseEntity.status(HttpStatus.CREATED).success("Entrega registrada!")
     }
 
-    fun getDeliveryByCode(code: String): ResponseEntity<Any> {
-        val delivery = deliveryRepository.findByTrackingCode(code)
-            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(mapOf("success" to false, "message" to "Encomenda não encontrada."))
+    fun getDeliveryByCode(condominium: Condominium, code: String): ResponseEntity<Any> {
+        val delivery = deliveryRepository.findByCondominiumAndTrackingCode(condominium, code)
+            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).error("Encomenda não encontrada.")
 
         return ResponseEntity.ok(mapOf("success" to true, "delivery" to delivery.toResponse()))
     }
 
-    fun confirmDelivery(code: String): ResponseEntity<Any> {
-        val delivery = deliveryRepository.findByTrackingCode(code)
-            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(mapOf("success" to false, "message" to "Encomenda não encontrada."))
+    @Transactional
+    fun confirmDelivery(condominium: Condominium, code: String): ResponseEntity<Any> {
+        val delivery = deliveryRepository.findByCondominiumAndTrackingCode(condominium, code)
+            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).error("Encomenda não encontrada.")
 
         if (delivery.status == DeliveryStatus.DELIVERED) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(mapOf("success" to false, "message" to "Esta encomenda já foi entregue anteriormente."))
+            return ResponseEntity.status(HttpStatus.CONFLICT).error("Esta encomenda já foi entregue anteriormente.")
         }
 
         delivery.status = DeliveryStatus.DELIVERED
@@ -91,6 +94,6 @@ class DoormanService(
 
         deliveryRepository.save(delivery)
 
-        return ResponseEntity.ok(mapOf("success" to true, "message" to "Entrega confirmada com sucesso!"))
+        return ResponseEntity.status(HttpStatus.OK).success("Entrega confirmada com sucesso!")
     }
 }

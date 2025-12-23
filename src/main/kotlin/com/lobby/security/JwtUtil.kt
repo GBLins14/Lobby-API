@@ -46,9 +46,4 @@ class JwtUtil(
         val claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).body
         return claims["tokenVersion"] as Int
     }
-
-    fun getRole(token: String): String {
-        val claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).body
-        return claims["role"] as String
-    }
 }

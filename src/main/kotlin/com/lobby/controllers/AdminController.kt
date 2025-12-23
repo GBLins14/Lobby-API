@@ -4,25 +4,24 @@ import com.lobby.annotations.CurrentUser
 import com.lobby.dto.BanDto
 import com.lobby.dto.SetRoleDto
 import com.lobby.models.User
+import com.lobby.services.AdminService
 import com.lobby.services.SyndicService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/syndic")
-class SyndicController(
-    private val syndicService: SyndicService,
+@RequestMapping("/api/admin")
+class AdminController(
+    private val adminService: AdminService,
+    private val syndicService: SyndicService
 ) {
-    @GetMapping("/deliveries")
-    fun getAllDeliveries(@CurrentUser user: User): ResponseEntity<Any> {
-        if (user.condominium == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(mapOf("success" to false, "message" to "Você não está registrado em nenhum condomínio."))
-        }
-        return syndicService.getAllDeliveries(user.condominium!!)
-    }
-
     @GetMapping("/accounts")
     fun getAccounts(@CurrentUser user: User): ResponseEntity<Any> {
         if (user.condominium == null) {
@@ -47,7 +46,7 @@ class SyndicController(
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(mapOf("success" to false, "message" to "Você não está registrado em nenhum condomínio."))
         }
-        return syndicService.approveAccount(user.condominium!!, accountId)
+        return adminService.approveAccount(user.condominium!!, accountId)
     }
 
     @GetMapping("/accounts/{login}")
@@ -70,7 +69,7 @@ class SyndicController(
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(mapOf("success" to false, "message" to "Você não está registrado em nenhum condomínio."))
         }
-        return syndicService.updateRole(user.condominium!!, request)
+        return adminService.updateRole(user.condominium!!, request)
     }
 
     @PatchMapping("/accounts/ban")
@@ -79,7 +78,7 @@ class SyndicController(
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(mapOf("success" to false, "message" to "Você não está registrado em nenhum condomínio."))
         }
-        return syndicService.banAccount(user.condominium!!, request)
+        return adminService.banAccount(user.condominium!!, request)
     }
 
     @PatchMapping("/accounts/unban/{accountId}")
@@ -88,7 +87,7 @@ class SyndicController(
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(mapOf("success" to false, "message" to "Você não está registrado em nenhum condomínio."))
         }
-        return syndicService.unbanAccount(user.condominium!!, accountId)
+        return adminService.unbanAccount(user.condominium!!, accountId)
     }
 
     @GetMapping("/accounts/bans")
@@ -106,6 +105,7 @@ class SyndicController(
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(mapOf("success" to false, "message" to "Você não está registrado em nenhum condomínio."))
         }
-        return syndicService.deleteAccount(user.condominium!!, accountId)
+        return adminService.deleteAccount(user.condominium!!, accountId)
     }
+
 }
