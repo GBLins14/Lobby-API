@@ -25,7 +25,7 @@ Uma API RESTful desenvolvida com **Arquitetura em Camadas (Service Layer)**, foc
 * **Autenticação Stateless:** Uso de JWT (JSON Web Tokens) com controle de sessão via `tokenVersion` (permite invalidar tokens em caso de roubo ou banimento).
 * **Proteção contra Brute-Force:** O sistema detecta tentativas falhas de login e **bane temporariamente** o IP/Usuário após 5 erros.
 * **RBAC (Role-Based Access Control):**
-    * `ADMIN`: Gestão total do condomínio.
+    * `BUSINESS`: Gestão total do condomínio.
     * `SYNDIC`: Gestão total de usuários e encomendas (Aprovar porteiros, banir usuários, ver encomendas, confirmar encomendas, etc).
     * `DOORMAN`: Registrar e entregar encomendas.
     * `RESIDENT`: Apenas visualização de suas encomendas.

@@ -49,7 +49,7 @@ class SyndicService(
         val account = accountRepository.findByCondominiumAndId(condominium, accountId)
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).error("Conta não encontrada.")
 
-        if (account.role == Role.ADMIN || account.role == Role.SYNDIC) {
+        if (account.role == Role.BUSINESS || account.role == Role.SYNDIC) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Você não pode aprovar uma conta com o cargo maior ou igual o seu, solicite a aprovação para a empresa!")
         }
 
@@ -75,7 +75,7 @@ class SyndicService(
         val account = accountRepository.findByCondominiumAndId(condominium, request.id)
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).error("Conta não encontrada.")
 
-        if (account.role == Role.ADMIN || account.role == Role.SYNDIC) {
+        if (account.role == Role.BUSINESS || account.role == Role.SYNDIC) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Você não pode editar uma conta com o cargo maior ou igual o seu, solicite a mudança para a empresa!")
         }
 
@@ -99,7 +99,7 @@ class SyndicService(
         val account = accountRepository.findByCondominiumAndId(condominium, request.id)
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).error("Conta não encontrada.")
 
-        if (account.role == Role.ADMIN || account.role == Role.SYNDIC) {
+        if (account.role == Role.BUSINESS || account.role == Role.SYNDIC) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Você não pode bloquear uma conta com o cargo maior ou igual o seu, solicite o bloqueamento para a empresa!")
         }
 
@@ -131,7 +131,7 @@ class SyndicService(
         val account = accountRepository.findByCondominiumAndId(condominium, accountId)
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).error("Conta não encontrada.")
 
-        if (account.role == Role.ADMIN || account.role == Role.SYNDIC) {
+        if (account.role == Role.BUSINESS || account.role == Role.SYNDIC) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Você não pode desbloquear uma conta com o cargo maior ou igual o seu, solicite o desbloqueamento para a empresa!")
         }
 
@@ -159,7 +159,7 @@ class SyndicService(
         val account = accountRepository.findByCondominiumAndId(condominium, accountId)
             ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).error("Conta não encontrada.")
 
-        if (account.role == Role.ADMIN || account.role == Role.SYNDIC) {
+        if (account.role == Role.BUSINESS || account.role == Role.SYNDIC) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Você não pode excluir uma conta com o cargo maior ou igual o seu, solicite a exclusão para a empresa!")
         }
 

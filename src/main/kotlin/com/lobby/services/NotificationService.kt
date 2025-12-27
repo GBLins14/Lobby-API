@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient
 
 @Service
 class NotificationService(
-    @Value("\${app.resend-api-key}") private val apiKey: String
+    @Value("\${resend.resend-api-key}") private val apiKey: String
 ) {
     private val logger = LoggerFactory.getLogger(ForgotPasswordService::class.java)
 

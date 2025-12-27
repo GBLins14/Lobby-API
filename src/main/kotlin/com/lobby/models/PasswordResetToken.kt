@@ -1,6 +1,8 @@
 package com.lobby.models
 
 import jakarta.persistence.*
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import java.time.Instant
 import java.util.UUID
 
@@ -16,6 +18,7 @@ class PasswordResetToken(
 
     @OneToOne(targetEntity = User::class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     val user: User,
 
     @Column(nullable = false)

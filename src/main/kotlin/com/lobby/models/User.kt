@@ -5,6 +5,9 @@ import com.lobby.enums.Role
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.lobby.enums.SubscriptionPlan
 import jakarta.persistence.*
+import org.hibernate.Hibernate
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import java.time.Instant
 
 @Entity
@@ -31,8 +34,12 @@ data class User(
     @Enumerated(EnumType.STRING)
     var subscriptionPlan: SubscriptionPlan? = null,
 
-    @ManyToOne
+    @Column(unique = true)
+    var stripeSubscriptionId: String? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "condominium_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     var condominium: Condominium? = null,
 
     var block: String? = null,
@@ -65,7 +72,7 @@ data class User(
     var tokenVersion: Int = 0,
 
     @Column(nullable = false)
-    var createdAt: Instant = Instant.now(),
+    val createdAt: Instant = Instant.now(),
 
     var updatedAt: Instant = Instant.now()
 ) {
@@ -81,5 +88,18 @@ data class User(
     fun isBanExpired(): Boolean {
         if (banExpiresAt == null) return false
         return Instant.now().isAfter(banExpiresAt)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || Hibernate.getClass(this) != Hibernate.getClass(other)) return false
+        other as User
+        return id != 0L && id == other.id
+    }
+
+    override fun hashCode(): Int = javaClass.hashCode()
+
+    override fun toString(): String {
+        return "User(id=$id, username='$username', email='$email', role=$role)"
     }
 }

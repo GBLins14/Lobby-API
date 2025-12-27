@@ -57,7 +57,7 @@ class CondominiumService(
         checkDuplicate(existingBusinessPhone, "Já existe um condomínio registrado com este número de telefone.")?.let { return it }
         checkDuplicate(existingByOwner, "Já existe um condomínio registrado em sua conta.")?.let { return it }
 
-        if (user.role != Role.ADMIN) {
+        if (user.role != Role.BUSINESS) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Você não pode registrar um condomínio fora de uma conta empresarial.")
         }
 
@@ -102,5 +102,11 @@ class CondominiumService(
                 "message" to "Condomínio registrado com sucesso.",
                 "condominiumCode" to condominiumCode
             ))
+    }
+
+    @Transactional
+    fun deleteCondominium(id: Long) {
+        accountRepository.deleteByCondominiumId(id)
+        condominiumRepository.deleteById(id)
     }
 }

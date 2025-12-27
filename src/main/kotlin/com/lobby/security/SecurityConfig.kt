@@ -23,11 +23,14 @@ class SecurityConfig(
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                it.requestMatchers("/api/webhooks/**").permitAll()
                 it.requestMatchers("/api/auth/**").permitAll()
-                it.requestMatchers("/api/doorman/**").hasAnyRole("DOORMAN", "SYNDIC", "ADMIN")
-                it.requestMatchers("/api/syndic/**").hasAnyRole("SYNDIC", "ADMIN")
-                it.requestMatchers("/api/condominium/**").hasRole("ADMIN")
-                it.requestMatchers("/api/admin/**").hasRole("ADMIN")
+                it.requestMatchers("/api/doorman/**").hasAnyRole("DOORMAN", "SYNDIC", "BUSINESS")
+                it.requestMatchers("/api/syndic/**").hasAnyRole("SYNDIC", "BUSINESS")
+                it.requestMatchers("/api/condominium/**").hasRole("BUSINESS")
+                it.requestMatchers("/api/admin/**").hasRole("BUSINESS")
+                it.requestMatchers("/api/plan").permitAll()
+                it.requestMatchers("/api/plan/**").hasRole("BUSINESS")
                 it.anyRequest().authenticated()
             }
             .formLogin { it.disable() }

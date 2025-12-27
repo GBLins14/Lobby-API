@@ -5,6 +5,7 @@ import com.lobby.dto.ForgotPasswordRequest
 import com.lobby.dto.ResetPasswordRequest
 import com.lobby.dto.SignInDto
 import com.lobby.dto.SignUpDto
+import com.lobby.extensions.success
 import com.lobby.models.CustomUserDetails
 import com.lobby.models.User
 import com.lobby.services.AuthService
@@ -44,12 +45,7 @@ class AuthController(
     fun forgotPassword(@RequestBody request: ForgotPasswordRequest): ResponseEntity<Any> {
         authService.processForgotPassword(request.email)
 
-        return ResponseEntity.ok(
-            mapOf(
-                "success" to true,
-                "message" to "Se o e-mail estiver cadastrado, você receberá um link de recuperação."
-            )
-        )
+        return ResponseEntity.status(HttpStatus.OK).success("Se o e-mail estiver cadastrado, você receberá um link de recuperação.")
     }
 
     @PostMapping("/reset-password")

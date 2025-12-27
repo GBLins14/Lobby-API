@@ -1,5 +1,16 @@
+resend:
+  resend-api-key: ${RESEND_API_KEY}
+
+stripe:
+  stripe-api-key: ${STRIPE_API_KEY}
+  stripe-webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+
+  plans:
+    basic: ${STRIPE_PLAN_BASIC}
+    professional: ${STRIPE_PLAN_PROFESSIONAL}
+    premium: ${STRIPE_PLAN_PREMIUM}
+
 app:
-  resend-api-key: ${APP_RESEND_API_KEY}
   frontend-url: ${APP_FRONTEND_URL}
   swagger-url: ${APP_SWAGGER_URL}
   max-requests-per-minutes: ${APP_MAX_REQUESTS_PER_MINUTES}

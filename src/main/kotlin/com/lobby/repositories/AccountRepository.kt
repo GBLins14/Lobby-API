@@ -6,6 +6,10 @@ import com.lobby.models.User
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface AccountRepository : JpaRepository<User, Long> {
+    fun deleteByCondominiumId(id: Long)
+
+    fun findByStripeSubscriptionId(stripeSubscriptionId: String): User?
+
     fun findByUsernameOrEmail(username: String, email: String): User?
     fun findByCpf(cpf: String): User?
     fun findByUsername(username: String): User?

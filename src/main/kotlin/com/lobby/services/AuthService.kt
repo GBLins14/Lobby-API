@@ -78,25 +78,25 @@ class AuthService(
         checkDuplicate(existingEmail, "Já existe uma conta registrada com este endereço de email.")?.let { return it }
         checkDuplicate(existingPhone, "Já existe uma conta registrada com este número de telefone.")?.let { return it }
 
-        val condominium = if (!request.condominiumCode.isNullOrBlank()) {
+        val condominium = if (!request.condominiumCode.isNullOrBlank() && request.role != Role.BUSINESS) {
             condominiumRepository.findByCondominiumCode(request.condominiumCode)
                 ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).error("Nenhum condomínio foi encontrado com este código.")
         } else {
             null
         }
 
-        if (condominium == null && request.role != Role.ADMIN) {
+        if (condominium == null && request.role != Role.BUSINESS) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("Para se cadastrar como morador, porteiro ou síndico, é obrigatório informar o código do condomínio.")
         }
 
-        if (condominium != null && request.role == Role.ADMIN) {
+        if (condominium != null && request.role == Role.BUSINESS) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Você não pode criar uma conta empresarial estando registrado em um condomínio existente.")
         }
 
         val (accountStatus, finalRole, messageReturn) = when (request.role) {
-            Role.ADMIN -> Triple(
+            Role.BUSINESS -> Triple(
                 AccountStatus.CREATING,
-                Role.ADMIN,
+                Role.BUSINESS,
                 "Conta registrada com sucesso."
             )
             Role.SYNDIC -> Triple(
@@ -123,8 +123,8 @@ class AuthService(
             email = request.email,
             phone = request.phone,
             condominium = condominium,
-            block = if (finalRole == Role.ADMIN || finalRole == Role.DOORMAN) null else request.block,
-            apartmentNumber = if (finalRole == Role.ADMIN || finalRole == Role.DOORMAN) null else request.apartmentNumber,
+            block = if (finalRole == Role.BUSINESS || finalRole == Role.DOORMAN) null else request.block,
+            apartmentNumber = if (finalRole == Role.BUSINESS || finalRole == Role.DOORMAN) null else request.apartmentNumber,
             hashedPassword = bcrypt.encodePassword(request.password),
             role = finalRole,
             accountStatus = accountStatus

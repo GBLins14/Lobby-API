@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.EnableAsync
 @EnableAsync
 @SpringBootApplication
 class LobbyApplication
-
 fun main(args: Array<String>) {
     try {
         val dotenv = Dotenv.configure().ignoreIfMissing().load()

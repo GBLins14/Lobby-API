@@ -29,6 +29,11 @@ class RateLimitFilter(
         val httpResponse = response as HttpServletResponse
         val path = httpRequest.requestURI
 
+        if (path.startsWith("/api/webhooks")) {
+            chain.doFilter(request, response)
+            return
+        }
+
         val protected = protectedRotes.any { path.startsWith(it) }
 
         if (protected) {
