@@ -63,8 +63,8 @@ Uma API RESTful desenvolvida com **Arquitetura em Camadas (Service Layer)**, foc
 
 ### 1. Clone o repositório
 ```bash 
-git clone https://github.com/SEU_USUARIO/lobby-backend.git 
-cd lobby-backend
+git clone https://github.com/GBLins14/Lobby-API.git
+cd Lobby-API
 ```
 
 ### 2. Configure as Variáveis de Ambiente
