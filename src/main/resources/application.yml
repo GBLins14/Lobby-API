@@ -16,6 +16,7 @@ app:
   max-requests-per-minutes: ${APP_MAX_REQUESTS_PER_MINUTES}
 
   sign:
+    min-fullname-length: ${APP_MIN_FULLNAME_LENGTH}
     min-username-length: ${APP_MIN_USERNAME_LENGTH}
     max-username-length: ${APP_MAX_USERNAME_LENGTH}
     min-password-length: ${APP_MIN_PASSWORD_LENGTH}

@@ -42,7 +42,7 @@ class PlanController(
         } catch (e: Exception) {
             e.printStackTrace()
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(mapOf("error" to "Não foi possível cancelar no momento. Tente novamente."))
+                .body(mapOf("error" to "Não foi possível cancelar o seu plano no momento. Tente novamente mais tarde."))
         }
     }
 }

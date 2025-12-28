@@ -52,10 +52,10 @@ class CondominiumService(
         val existingBusinessPhone = condominiumRepository.findByBusinessPhone(request.businessPhone)
         val existingByOwner = condominiumRepository.findByOwnerId(user.id)
 
+        checkDuplicate(existingByOwner, "Já existe um condomínio registrado em sua conta.")?.let { return it }
         checkDuplicate(existingCnpj, "Já existe um condomínio registrado com este CNPJ.")?.let { return it }
         checkDuplicate(existingBusinessEmail, "Já existe um condomínio registrado com este endereço de email.")?.let { return it }
         checkDuplicate(existingBusinessPhone, "Já existe um condomínio registrado com este número de telefone.")?.let { return it }
-        checkDuplicate(existingByOwner, "Já existe um condomínio registrado em sua conta.")?.let { return it }
 
         if (user.role != Role.BUSINESS) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Você não pode registrar um condomínio fora de uma conta empresarial.")

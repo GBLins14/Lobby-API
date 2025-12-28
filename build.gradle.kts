@@ -46,6 +46,7 @@ dependencies {
     implementation("com.bucket4j:bucket4j-core:8.9.0")
     implementation("com.resend:resend-java:2.2.0")
     implementation("com.stripe:stripe-java:24.12.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0")
 }
 
 kotlin {

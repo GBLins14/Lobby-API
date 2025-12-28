@@ -37,6 +37,7 @@ class AuthService(
     private val forgotPasswordService: ForgotPasswordService,
     @Value("\${app.frontend-url}") private val FRONTEND_URL: String,
     @Value("\${app.password-recovery.token-expiration-minutes}") private val TOKEN_EXPIRATION_MINUTES: Long,
+    @Value("\${app.sign.min-fullname-length}") private val MIN_FULLNAME_LENGTH: Int,
     @Value("\${app.sign.min-username-length}") private val MIN_USERNAME_LENGTH: Int,
     @Value("\${app.sign.max-username-length}") private val MAX_USERNAME_LENGTH: Int,
     @Value("\${app.sign.min-password-length}") private val MIN_PASSWORD_LENGTH: Int,
@@ -47,6 +48,10 @@ class AuthService(
     @Transactional
     fun register(request: SignUpDto): ResponseEntity<Any> {
         val cleanedCpf = validatorUtil.cleanCpfOrCnpj(request.cpf)
+
+        if (request.fullName.length < MIN_FULLNAME_LENGTH) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("É necessário inserir o seu nome completo.")
+        }
 
         if (!validatorUtil.isValidCpf(cleanedCpf)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("É necessário inserir um número de CPF que seja válido.")

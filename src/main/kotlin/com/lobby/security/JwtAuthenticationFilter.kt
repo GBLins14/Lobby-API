@@ -73,6 +73,10 @@ class JwtAuthenticationFilter(
             accountRepository.save(user)
         }
 
+        if (user.condominium?.isActive != true) {
+            sendErrorJson(response, "Condomínio temporariamente bloqueado. Tente novamente mais tarde.")
+        }
+
         val authorities = listOf(SimpleGrantedAuthority("ROLE_${user.role.name.uppercase()}"))
         val authentication = UsernamePasswordAuthenticationToken(
             CustomUserDetails(user),
