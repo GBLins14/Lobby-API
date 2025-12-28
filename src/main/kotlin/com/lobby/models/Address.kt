@@ -5,7 +5,7 @@ import jakarta.persistence.Embeddable
 
 @Embeddable
 data class Address(
-    @Column(nullable = false, length = 9)
+    @Column(nullable = false)
     var zipCode: String,
 
     @Column(nullable = false)
@@ -23,6 +23,6 @@ data class Address(
     @Column(nullable = false)
     var city: String,
 
-    @Column(nullable = false, length = 2)
+    @Column(nullable = false)
     var state: String
 )

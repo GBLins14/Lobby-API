@@ -47,10 +47,14 @@ class CondominiumService(
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("É necessário inserir um número de telefone que seja válido.")
         }
 
+        if (request.address.zipCode.isNullOrBlank() || request.address.city.isNullOrBlank() || request.address.number.isNullOrBlank() || request.address.street.isNullOrBlank() || request.address.neighborhood.isNullOrBlank() || request.address.state.isNullOrBlank()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("É necessário inserir todos os dados do endereço.")
+        }
+
+        val existingByOwner = condominiumRepository.findByOwnerId(user.id)
         val existingCnpj = condominiumRepository.findByCnpj(cleanedCnpj)
         val existingBusinessEmail = condominiumRepository.findByBusinessEmail(request.businessEmail)
         val existingBusinessPhone = condominiumRepository.findByBusinessPhone(request.businessPhone)
-        val existingByOwner = condominiumRepository.findByOwnerId(user.id)
 
         checkDuplicate(existingByOwner, "Já existe um condomínio registrado em sua conta.")?.let { return it }
         checkDuplicate(existingCnpj, "Já existe um condomínio registrado com este CNPJ.")?.let { return it }
