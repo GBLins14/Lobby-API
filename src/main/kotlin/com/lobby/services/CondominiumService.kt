@@ -47,7 +47,7 @@ class CondominiumService(
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("É necessário inserir um número de telefone que seja válido.")
         }
 
-        if (request.address.zipCode.isNullOrBlank() || request.address.city.isNullOrBlank() || request.address.number.isNullOrBlank() || request.address.street.isNullOrBlank() || request.address.neighborhood.isNullOrBlank() || request.address.state.isNullOrBlank()) {
+        if (request.address.zipCode.isBlank() || request.address.city.isBlank() || request.address.number.isBlank() || request.address.street.isBlank() || request.address.neighborhood.isBlank() || request.address.state.isBlank()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("É necessário inserir todos os dados do endereço.")
         }
 
@@ -106,11 +106,5 @@ class CondominiumService(
                 "message" to "Condomínio registrado com sucesso.",
                 "condominiumCode" to condominiumCode
             ))
-    }
-
-    @Transactional
-    fun deleteCondominium(id: Long) {
-        accountRepository.deleteByCondominiumId(id)
-        condominiumRepository.deleteById(id)
     }
 }
