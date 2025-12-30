@@ -236,9 +236,11 @@ class AuthService(
         val user = resetToken.user
 
         user.hashedPassword = bcrypt.encodePassword(newPassword)
+        user.tokenVersion += 1
 
         accountRepository.save(user)
         tokenRepository.delete(resetToken)
+        SecurityContextHolder.clearContext()
     }
 
     fun getMe(user: User): UserResponse {
