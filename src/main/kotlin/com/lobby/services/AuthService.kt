@@ -2,11 +2,13 @@ package com.lobby.services
 
 import com.lobby.dto.SignInDto
 import com.lobby.dto.SignUpDto
+import com.lobby.dto.UserResponse
 import com.lobby.enums.AccountStatus
 import com.lobby.dto.toResponseDTO
 import com.lobby.enums.Role
-import com.lobby.extensions.error
-import com.lobby.extensions.success
+import com.lobby.exceptions.BadRequestException
+import com.lobby.exceptions.NotFoundException
+import com.lobby.exceptions.UnauthorizedException
 import com.lobby.models.User
 import com.lobby.models.PasswordResetToken
 import com.lobby.repositories.AccountRepository
@@ -18,8 +20,6 @@ import com.lobby.utils.checkDuplicate
 import com.lobby.utils.generateToken
 import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.slf4j.LoggerFactory
@@ -46,31 +46,31 @@ class AuthService(
     @Value("\${app.sign.lockout-minutes}") private val LOCKOUT_MINUTES: Long
 ) {
     @Transactional
-    fun register(request: SignUpDto): ResponseEntity<Any> {
+    fun register(request: SignUpDto): String {
         val cleanedCpf = validatorUtil.cleanCpfOrCnpj(request.cpf)
 
         if (request.fullName.length < MIN_FULLNAME_LENGTH) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("É necessário inserir o seu nome completo.")
+            throw BadRequestException("É necessário inserir o seu nome completo.")
         }
 
         if (!validatorUtil.isValidCpf(cleanedCpf)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("É necessário inserir um número de CPF que seja válido.")
+            throw BadRequestException("É necessário inserir um número de CPF que seja válido.")
         }
 
         if (request.username.length !in MIN_USERNAME_LENGTH..MAX_USERNAME_LENGTH) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("O nome de usuário deve conter no mínimo $MIN_USERNAME_LENGTH caracteres, e no máximo $MAX_USERNAME_LENGTH caracteres.")
+            throw BadRequestException("O nome de usuário deve conter no mínimo $MIN_USERNAME_LENGTH caracteres, e no máximo $MAX_USERNAME_LENGTH caracteres.")
         }
 
         if (!validatorUtil.isValidEmail(request.email)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("É necessário inserir um endereço de email que seja válido.")
+            throw BadRequestException("É necessário inserir um endereço de email que seja válido.")
         }
 
         if (!validatorUtil.isValidPhone(request.phone)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("É necessário inserir um número de telefone que seja válido.")
+            throw BadRequestException("É necessário inserir um número de telefone que seja válido.")
         }
 
         if (request.password.length !in MIN_PASSWORD_LENGTH..MAX_PASSWORD_LENGTH) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("A senha deve conter no mínimo $MIN_PASSWORD_LENGTH caracteres, e no máximo $MAX_PASSWORD_LENGTH caracteres.")
+            throw BadRequestException("A senha deve conter no mínimo $MIN_PASSWORD_LENGTH caracteres, e no máximo $MAX_PASSWORD_LENGTH caracteres.")
         }
 
         val existingCpf = accountRepository.findByCpf(cleanedCpf)
@@ -78,24 +78,24 @@ class AuthService(
         val existingEmail = accountRepository.findByEmail(request.email)
         val existingPhone = accountRepository.findByPhone(request.phone)
 
-        checkDuplicate(existingCpf, "Já existe uma conta registrada com este número de CPF.")?.let { return it }
-        checkDuplicate(existingUsername, "Já existe uma conta registrada com este nome de usuário.")?.let { return it }
-        checkDuplicate(existingEmail, "Já existe uma conta registrada com este endereço de email.")?.let { return it }
-        checkDuplicate(existingPhone, "Já existe uma conta registrada com este número de telefone.")?.let { return it }
+        checkDuplicate(existingCpf, "Já existe uma conta registrada com este número de CPF.")
+        checkDuplicate(existingUsername, "Já existe uma conta registrada com este nome de usuário.")
+        checkDuplicate(existingEmail, "Já existe uma conta registrada com este endereço de email.")
+        checkDuplicate(existingPhone, "Já existe uma conta registrada com este número de telefone.")
 
         val condominium = if (!request.condominiumCode.isNullOrBlank() && request.role != Role.BUSINESS) {
             condominiumRepository.findByCondominiumCode(request.condominiumCode)
-                ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).error("Nenhum condomínio foi encontrado com este código.")
+                ?: throw NotFoundException("Nenhum condomínio foi encontrado com este código.")
         } else {
             null
         }
 
         if (condominium == null && request.role != Role.BUSINESS) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("Para se cadastrar como morador, porteiro ou síndico, é obrigatório informar o código do condomínio.")
+            throw BadRequestException("Para se cadastrar como morador, porteiro ou síndico, é obrigatório informar o código do condomínio.")
         }
 
         if (condominium != null && request.role == Role.BUSINESS) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Você não pode criar uma conta empresarial estando registrado em um condomínio existente.")
+            throw UnauthorizedException("Você não pode criar uma conta empresarial estando registrado em um condomínio existente.")
         }
 
         val (accountStatus, finalRole, messageReturn) = when (request.role) {
@@ -136,21 +136,21 @@ class AuthService(
         )
 
         accountRepository.save(user)
-        return ResponseEntity.status(HttpStatus.CREATED).success(messageReturn)
+        return messageReturn
     }
 
     @Transactional
-    fun login(request: SignInDto): ResponseEntity<Any> {
+    fun login(request: SignInDto): String {
         val user = accountRepository.findByUsernameOrEmail(request.login, request.login)
-            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Usuário ou senha incorretos.")
+            ?: throw UnauthorizedException("Usuário ou senha incorretos.")
 
         if (user.banned) {
             if (user.banExpiresAt == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Sua conta está permanentemente bloqueada.")
+                throw UnauthorizedException("Sua conta está permanentemente bloqueada.")
             }
 
             if (!user.isBanExpired()) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Conta temporariamente bloqueada. Tente mais tarde.")
+                throw UnauthorizedException("Conta temporariamente bloqueada. Tente mais tarde.")
             }
 
             user.apply {
@@ -173,15 +173,15 @@ class AuthService(
                 user.banExpiresAt = now.plus(LOCKOUT_MINUTES, ChronoUnit.MINUTES)
                 accountRepository.save(user)
 
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Conta bloqueada devido a tentativas excessivas.")
+                throw UnauthorizedException("Conta bloqueada devido a tentativas excessivas.")
             }
 
             accountRepository.save(user)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Usuário ou senha incorretos.")
+            throw UnauthorizedException("Usuário ou senha incorretos.")
         }
 
         if (user.accountStatus == AccountStatus.PENDING) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("A sua conta ainda não foi aprovada, aguarde a liberação.")
+            throw UnauthorizedException("A sua conta ainda não foi aprovada, aguarde a liberação.")
         }
 
         user.failedLoginAttempts = 0
@@ -189,7 +189,7 @@ class AuthService(
 
         val token = jwtUtil.generateToken(user.username, user.role, user.tokenVersion)
 
-        return ResponseEntity.ok(mapOf("success" to true, "token" to token))
+        return token
     }
 
     val logger = LoggerFactory.getLogger(AuthService::class.java)
@@ -220,17 +220,17 @@ class AuthService(
     }
 
     @Transactional
-    fun processResetPassword(token: String, newPassword: String): ResponseEntity<Any> {
+    fun processResetPassword(token: String, newPassword: String) {
         val resetToken = tokenRepository.findByToken(token)
-            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).error("Token inválido ou não encontrado.")
+            ?: throw NotFoundException("Token inválido ou não encontrado.")
 
         if (resetToken.isExpired()) {
             tokenRepository.delete(resetToken)
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Este link expirou. Solicite uma nova recuperação.")
+            throw UnauthorizedException("Este link expirou. Solicite uma nova recuperação.")
         }
 
         if (newPassword.length !in MIN_PASSWORD_LENGTH..MAX_PASSWORD_LENGTH) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("A senha deve conter no mínimo $MIN_PASSWORD_LENGTH caracteres, e no máximo $MAX_PASSWORD_LENGTH caracteres.")
+            throw BadRequestException("A senha deve conter no mínimo $MIN_PASSWORD_LENGTH caracteres, e no máximo $MAX_PASSWORD_LENGTH caracteres.")
         }
 
         val user = resetToken.user
@@ -239,20 +239,16 @@ class AuthService(
 
         accountRepository.save(user)
         tokenRepository.delete(resetToken)
-
-        return ResponseEntity.status(HttpStatus.OK).success("Sua senha foi alterada com sucesso! Você já pode fazer login.")
     }
 
-    fun getMe(user: User): ResponseEntity<Any> {
-        return ResponseEntity.ok(mapOf("success" to true, "user" to user.toResponseDTO()))
+    fun getMe(user: User): UserResponse {
+        return user.toResponseDTO()
     }
 
     @Transactional
-    fun logout(user: User): ResponseEntity<Any> {
+    fun logout(user: User) {
         user.tokenVersion += 1
         accountRepository.save(user)
         SecurityContextHolder.clearContext()
-
-        return ResponseEntity.status(HttpStatus.OK).success("Logout realizado com sucesso.")
     }
 }

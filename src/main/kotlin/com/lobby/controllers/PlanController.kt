@@ -2,6 +2,7 @@ package com.lobby.controllers
 
 import com.lobby.annotations.CurrentUser
 import com.lobby.dto.SubscriptionRequest
+import com.lobby.exceptions.BadRequestException
 import com.lobby.extensions.error
 import com.lobby.models.User
 import com.lobby.services.PlanService
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/plan")
+@RequestMapping("/v1/plan")
 class PlanController(
     private val planService: PlanService
 ) {
@@ -37,7 +38,7 @@ class PlanController(
         return try {
             planService.planCancel(user)
             ResponseEntity.ok().body(mapOf("message" to "Assinatura cancelada com sucesso. Sentiremos sua falta!"))
-        } catch (e: IllegalArgumentException) {
+        } catch (e: BadRequestException) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).error("${e.message}")
         } catch (e: Exception) {
             e.printStackTrace()

@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 
 @RestController
-@RequestMapping("/api/webhooks")
+@RequestMapping("/v1/webhooks")
 class StripeWebhook(
     private val accountRepository: AccountRepository,
     private val condominiumRepository: CondominiumRepository,

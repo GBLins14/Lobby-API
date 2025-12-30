@@ -1,6 +1,8 @@
 package com.lobby.services
 
 import com.lobby.enums.SubscriptionPlan
+import com.lobby.exceptions.BadRequestException
+import com.lobby.exceptions.NotFoundException
 import com.lobby.models.User
 import com.lobby.repositories.AccountRepository
 import com.stripe.model.checkout.Session
@@ -31,7 +33,7 @@ class PlanService(
             SubscriptionPlan.BASIC -> STRIPE_PLAN_BASIC
             SubscriptionPlan.PROFESSIONAL -> STRIPE_PLAN_PROFESSIONAL
             SubscriptionPlan.PREMIUM -> STRIPE_PLAN_PREMIUM
-            else -> throw IllegalArgumentException("Plano não encontrado")
+            else -> throw NotFoundException("Plano não encontrado")
         }
 
         val params = SessionCreateParams.builder()
@@ -60,7 +62,7 @@ class PlanService(
         val subId = user.stripeSubscriptionId
 
         if (user.subscriptionPlan == null || subId == null) {
-            throw IllegalArgumentException("Você não tem nenhum plano ativo para cancelar.")
+            throw BadRequestException("Você não tem nenhum plano ativo para cancelar.")
         }
 
         try {

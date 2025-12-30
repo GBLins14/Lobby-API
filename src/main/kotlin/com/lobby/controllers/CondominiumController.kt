@@ -11,12 +11,13 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/condominium")
+@RequestMapping("/v1/condominium")
 class CondominiumController(
     private val condominiumService: CondominiumService,
 ) {
     @PostMapping("/sign-up")
     fun signUpCondominium(@CurrentUser user: User, @RequestBody request: SignUpCondominiumDto): ResponseEntity<Any> {
-        return condominiumService.signUp(user, request)
+        val condominiumCode = condominiumService.signUp(user, request)
+        return ResponseEntity.ok(condominiumCode)
     }
 }

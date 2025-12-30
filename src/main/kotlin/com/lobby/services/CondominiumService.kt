@@ -3,6 +3,8 @@ package com.lobby.services
 import com.lobby.dto.SignUpCondominiumDto
 import com.lobby.enums.AccountStatus
 import com.lobby.enums.Role
+import com.lobby.exceptions.BadRequestException
+import com.lobby.exceptions.UnauthorizedException
 import com.lobby.extensions.error
 import com.lobby.models.Condominium
 import com.lobby.models.User
@@ -25,30 +27,30 @@ class CondominiumService(
     @Value("\${app.condominium.max-condominium_name_length}") private val MAX_CONDOMINIUM_NAME_LENGTH: Int
 ) {
     @Transactional
-    fun signUp(user: User, request: SignUpCondominiumDto): ResponseEntity<Any> {
+    fun signUp(user: User, request: SignUpCondominiumDto): String {
         val cleanedCnpj = validatorUtil.cleanCpfOrCnpj(request.cnpj)
 
         val userPlan = user.subscriptionPlan
-            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Adquira um plano para poder registrar um condomínio.")
+            ?: throw UnauthorizedException("Adquira um plano para poder registrar um condomínio.")
 
         if (!validatorUtil.isValidCnpj(cleanedCnpj)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("É necessário inserir um número de CNPJ que seja válido.")
+            throw BadRequestException("É necessário inserir um número de CNPJ que seja válido.")
         }
 
         if (request.name.length !in MIN_CONDOMINIUM_NAME_LENGTH..MAX_CONDOMINIUM_NAME_LENGTH) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("O nome do seu condomínio deve conter no mínimo $MIN_CONDOMINIUM_NAME_LENGTH caracteres, e no máximo $MAX_CONDOMINIUM_NAME_LENGTH caracteres.")
+            throw BadRequestException("O nome do seu condomínio deve conter no mínimo $MIN_CONDOMINIUM_NAME_LENGTH caracteres, e no máximo $MAX_CONDOMINIUM_NAME_LENGTH caracteres.")
         }
 
         if (!validatorUtil.isValidEmail(request.businessEmail)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("É necessário inserir um endereço de email que seja válido.")
+            throw BadRequestException("É necessário inserir um endereço de email que seja válido.")
         }
 
         if (!validatorUtil.isValidPhone(request.businessPhone)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("É necessário inserir um número de telefone que seja válido.")
+            throw BadRequestException("É necessário inserir um número de telefone que seja válido.")
         }
 
         if (request.address.zipCode.isBlank() || request.address.city.isBlank() || request.address.number.isBlank() || request.address.street.isBlank() || request.address.neighborhood.isBlank() || request.address.state.isBlank()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).error("É necessário inserir todos os dados do endereço.")
+            throw BadRequestException("É necessário inserir todos os dados do endereço.")
         }
 
         val existingByOwner = condominiumRepository.findByOwnerId(user.id)
@@ -56,25 +58,25 @@ class CondominiumService(
         val existingBusinessEmail = condominiumRepository.findByBusinessEmail(request.businessEmail)
         val existingBusinessPhone = condominiumRepository.findByBusinessPhone(request.businessPhone)
 
-        checkDuplicate(existingByOwner, "Já existe um condomínio registrado em sua conta.")?.let { return it }
-        checkDuplicate(existingCnpj, "Já existe um condomínio registrado com este CNPJ.")?.let { return it }
-        checkDuplicate(existingBusinessEmail, "Já existe um condomínio registrado com este endereço de email.")?.let { return it }
-        checkDuplicate(existingBusinessPhone, "Já existe um condomínio registrado com este número de telefone.")?.let { return it }
+        checkDuplicate(existingByOwner, "Já existe um condomínio registrado em sua conta.")
+        checkDuplicate(existingCnpj, "Já existe um condomínio registrado com este CNPJ.")
+        checkDuplicate(existingBusinessEmail, "Já existe um condomínio registrado com este endereço de email.")
+        checkDuplicate(existingBusinessPhone, "Já existe um condomínio registrado com este número de telefone.")
 
         if (user.role != Role.BUSINESS) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Você não pode registrar um condomínio fora de uma conta empresarial.")
+            throw UnauthorizedException("Você não pode registrar um condomínio fora de uma conta empresarial.")
         }
 
         if (user.condominium != null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Você não pode registrar um condomínio estando registrado em um condomínio existente.")
+            throw UnauthorizedException("Você não pode registrar um condomínio estando registrado em um condomínio existente.")
         }
 
         if (request.blocksCount > userPlan.maxBlocks) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("O limite de blocos do seu plano atual é de ${userPlan.maxBlocks}.")
+            throw UnauthorizedException("O limite de blocos do seu plano atual é de ${userPlan.maxBlocks}.")
         }
 
         if (request.apartmentCount > userPlan.maxApartments) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("O limite de apartamentos do seu plano atual é de ${userPlan.maxApartments}.")
+            throw UnauthorizedException("O limite de apartamentos do seu plano atual é de ${userPlan.maxApartments}.")
         }
 
         val condominiumCode = generateCode()
@@ -100,11 +102,6 @@ class CondominiumService(
         }
         accountRepository.save(user)
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(mapOf(
-                "success" to true,
-                "message" to "Condomínio registrado com sucesso.",
-                "condominiumCode" to condominiumCode
-            ))
+        return condominiumCode
     }
 }

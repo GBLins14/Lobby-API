@@ -1,9 +1,14 @@
 package com.lobby.services
 
 import com.lobby.dto.CreateDeliveryDto
+import com.lobby.dto.DeliveryListDto
+import com.lobby.dto.DeliveryResponseDto
 import com.lobby.dto.toListResponse
 import com.lobby.dto.toResponse
 import com.lobby.enums.DeliveryStatus
+import com.lobby.exceptions.ConflictException
+import com.lobby.exceptions.NotFoundException
+import com.lobby.exceptions.UnauthorizedException
 import com.lobby.extensions.error
 import com.lobby.extensions.success
 import com.lobby.models.Condominium
@@ -26,17 +31,16 @@ class DoormanService(
 ) {
     private val logger = LoggerFactory.getLogger(AuthService::class.java)
 
-    fun getAllDeliveries(condominium: Condominium): ResponseEntity<Any> {
+    fun getAllDeliveries(condominium: Condominium): List<DeliveryListDto> {
         val deliveries = deliveryRepository.findByCondominium(condominium).map { it.toListResponse() }
 
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(mapOf("success" to true, "deliveries" to deliveries))
+        return deliveries
     }
 
     @Transactional
-    fun registerDelivery(request: CreateDeliveryDto, condominium: Condominium, doormanUsername: String): ResponseEntity<Any> {
+    fun registerDelivery(request: CreateDeliveryDto, condominium: Condominium, doormanUsername: String) {
         val doorman = accountRepository.findByUsername(doormanUsername)
-            ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).error("Ocorreu um erro com sua conta, tente novamente mais tarde.")
+            ?: throw UnauthorizedException("Ocorreu um erro com sua conta, tente novamente mais tarde.")
 
         val apartmentNumber = request.apartmentNumber?.uppercase()?.replace(Regex("[^A-Z0-9]"), "")
 
@@ -69,31 +73,27 @@ class DoormanService(
                 logger.error("Erro ao notificar ${resident.email}", e)
             }
         }
-
-        return ResponseEntity.status(HttpStatus.CREATED).success("Entrega registrada!")
     }
 
-    fun getDeliveryByCode(condominium: Condominium, code: String): ResponseEntity<Any> {
+    fun getDeliveryByCode(condominium: Condominium, code: String): DeliveryResponseDto {
         val delivery = deliveryRepository.findByCondominiumAndTrackingCode(condominium, code)
-            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).error("Encomenda não encontrada.")
+            ?: throw NotFoundException("Encomenda não encontrada.")
 
-        return ResponseEntity.ok(mapOf("success" to true, "delivery" to delivery.toResponse()))
+        return delivery.toResponse()
     }
 
     @Transactional
-    fun confirmDelivery(condominium: Condominium, code: String): ResponseEntity<Any> {
+    fun confirmDelivery(condominium: Condominium, code: String) {
         val delivery = deliveryRepository.findByCondominiumAndTrackingCode(condominium, code)
-            ?: return ResponseEntity.status(HttpStatus.NOT_FOUND).error("Encomenda não encontrada.")
+            ?: throw NotFoundException("Encomenda não encontrada.")
 
         if (delivery.status == DeliveryStatus.DELIVERED) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).error("Esta encomenda já foi entregue anteriormente.")
+            throw ConflictException("Esta encomenda já foi entregue anteriormente.")
         }
 
         delivery.status = DeliveryStatus.DELIVERED
         delivery.withdrawalDate = Instant.now()
 
         deliveryRepository.save(delivery)
-
-        return ResponseEntity.status(HttpStatus.OK).success("Entrega confirmada com sucesso!")
     }
 }

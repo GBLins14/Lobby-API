@@ -121,17 +121,12 @@ class ForgotPasswordService(
         )
 
         try {
-            logger.info("Tentando enviar email para: $email via API Spring...")
-
             val response = restClient.post()
                 .uri("/emails")
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(emailRequest)
                 .retrieve()
                 .toBodilessEntity()
-
-            logger.info("✅ Sucesso! Status Code: ${response.statusCode}")
-
         } catch (e: Exception) {
             logger.error("❌ Falha crítica ao enviar email via API: ${e.message}", e)
         }

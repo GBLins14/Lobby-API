@@ -1,9 +1,7 @@
 package com.lobby.utils
 
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
+import com.lobby.exceptions.ConflictException
 
-fun checkDuplicate(value: Any?, message: String): ResponseEntity<Any>? {
-    return if (value != null) ResponseEntity.status(HttpStatus.CONFLICT)
-        .body(mapOf("success" to false, "message" to message)) else null
+fun checkDuplicate(value: Any?, message: String) {
+    if (value != null) throw ConflictException(message)
 }

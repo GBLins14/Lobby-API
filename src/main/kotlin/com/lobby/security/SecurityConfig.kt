@@ -23,6 +23,7 @@ class SecurityConfig(
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                it.requestMatchers("/api/teste").permitAll()
                 it.requestMatchers("/api/webhooks/**").permitAll()
                 it.requestMatchers("/api/auth/**").permitAll()
                 it.requestMatchers("/api/doorman/**").hasAnyRole("DOORMAN", "SYNDIC", "BUSINESS")
