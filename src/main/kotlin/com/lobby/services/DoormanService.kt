@@ -6,12 +6,9 @@ import com.lobby.dto.DeliveryResponseDto
 import com.lobby.dto.toListResponse
 import com.lobby.dto.toResponse
 import com.lobby.enums.DeliveryStatus
-import com.lobby.exceptions.BadRequestException
 import com.lobby.exceptions.ConflictException
 import com.lobby.exceptions.NotFoundException
 import com.lobby.exceptions.UnauthorizedException
-import com.lobby.extensions.error
-import com.lobby.extensions.success
 import com.lobby.models.Condominium
 import com.lobby.models.Delivery
 import com.lobby.repositories.AccountRepository
@@ -19,8 +16,6 @@ import com.lobby.repositories.DeliveryRepository
 import com.lobby.utils.generateCode
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import java.time.Instant
 

@@ -5,7 +5,6 @@ import com.lobby.enums.AccountStatus
 import com.lobby.enums.Role
 import com.lobby.exceptions.BadRequestException
 import com.lobby.exceptions.UnauthorizedException
-import com.lobby.extensions.error
 import com.lobby.models.Condominium
 import com.lobby.models.User
 import com.lobby.repositories.AccountRepository
@@ -14,8 +13,6 @@ import com.lobby.utils.checkDuplicate
 import com.lobby.utils.generateCode
 import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service

@@ -1,15 +1,11 @@
 package com.lobby.services
 
-import com.lobby.dto.DeliveryListDto
 import com.lobby.dto.DeliveryResponseDto
 import com.lobby.dto.toResponse
 import com.lobby.exceptions.BadRequestException
 import com.lobby.exceptions.NotFoundException
-import com.lobby.extensions.error
 import com.lobby.models.Condominium
 import com.lobby.repositories.DeliveryRepository
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service

@@ -46,23 +46,19 @@ class JwtAuthenticationFilter(
         val tokenVersion = jwtUtil.getTokenVersion(token)
         if (tokenVersion != user.tokenVersion) {
             throw UnauthorizedException("Sessão expirada. Faça login novamente.")
-            return
         }
 
         if (user.accountStatus == AccountStatus.PENDING) {
             throw UnauthorizedException("A sua conta ainda não foi aprovada, aguarde a liberação.")
-            return
         }
 
         if (user.banned) {
             if (user.banExpiresAt == null) {
                 throw UnauthorizedException("Sua conta está permanentemente bloqueada.")
-                return
             }
 
             if (!user.isBanExpired()) {
                 throw UnauthorizedException("Conta temporariamente bloqueada. Tente mais tarde.")
-                return
             }
 
             user.apply {

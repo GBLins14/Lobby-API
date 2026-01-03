@@ -4,9 +4,7 @@ import com.lobby.enums.SubscriptionPlan
 import com.lobby.exceptions.BadRequestException
 import com.lobby.exceptions.NotFoundException
 import com.lobby.models.User
-import com.lobby.repositories.AccountRepository
 import com.stripe.model.checkout.Session
-import com.lobby.repositories.CondominiumRepository
 import com.stripe.model.Subscription
 import com.stripe.param.checkout.SessionCreateParams
 import jakarta.transaction.Transactional

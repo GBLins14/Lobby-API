@@ -35,7 +35,7 @@ class StripeWebhook(
 
         val event = try {
             Webhook.constructEvent(payload, sigHeader, endpointSecret)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature")
         }
 
@@ -89,7 +89,7 @@ class StripeWebhook(
                     email = account.email,
                     username = account.username,
                     planName = account.subscriptionPlan?.name ?: "atual",
-                    dashboardUrl = "$FRONTEND_URL"
+                    dashboardUrl = FRONTEND_URL
                 )
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -98,10 +98,7 @@ class StripeWebhook(
     }
 
     private fun handleRecurringPaymentSuccess(invoice: Invoice) {
-        val subscriptionId = invoice.subscription
-        if (subscriptionId == null) {
-            return
-        }
+        val subscriptionId = invoice.subscription ?: return
 
         val account = accountRepository.findByStripeSubscriptionId(subscriptionId) ?: return
 
@@ -109,15 +106,12 @@ class StripeWebhook(
             email = account.email,
             username = account.username,
             planName = account.subscriptionPlan?.name ?: "atual",
-            dashboardUrl = "$FRONTEND_URL"
+            dashboardUrl = FRONTEND_URL
         )
     }
 
     private fun handlePaymentFailed(invoice: Invoice) {
-        val subscriptionId = invoice.subscription
-        if (subscriptionId == null) {
-            return
-        }
+        val subscriptionId = invoice.subscription ?: return
 
         val account = accountRepository.findByStripeSubscriptionId(subscriptionId) ?: return
 

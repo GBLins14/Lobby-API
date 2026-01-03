@@ -2,13 +2,10 @@ package com.lobby.controllers
 
 import com.lobby.annotations.CurrentUser
 import com.lobby.dto.SubscriptionRequest
-import com.lobby.exceptions.BadRequestException
-import com.lobby.extensions.error
 import com.lobby.extensions.success
 import com.lobby.models.User
 import com.lobby.services.PlanService
 import io.swagger.v3.oas.annotations.security.SecurityRequirements
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
