@@ -24,7 +24,6 @@ class StripeWebhook(
     @Value("\${stripe.stripe-webhook-secret}") private val endpointSecret: String,
     @Value("\${app.frontend-url}") private val FRONTEND_URL: String
 ) {
-
     // Controller propositalmente mais acoplado
 
     @PostMapping("/stripe")
@@ -67,7 +66,6 @@ class StripeWebhook(
                 (stripeObject as? Subscription)?.let { handleSubscriptionDeleted(it) }
             }
         }
-
         return ResponseEntity.ok("Received")
     }
 

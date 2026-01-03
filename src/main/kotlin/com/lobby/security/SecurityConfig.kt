@@ -14,7 +14,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    private val jwtAuthenticationFilter: JwtAuthenticationFilter
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    @Value("\${app.frontend-url}") private val FRONTEND_URL: String,
+    @Value("\${app.swagger-url}") private val SWAGGER_URL: String
 ) {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -23,15 +25,14 @@ class SecurityConfig(
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                it.requestMatchers("/api/teste").permitAll()
-                it.requestMatchers("/api/webhooks/**").permitAll()
-                it.requestMatchers("/api/auth/**").permitAll()
-                it.requestMatchers("/api/doorman/**").hasAnyRole("DOORMAN", "SYNDIC", "BUSINESS")
-                it.requestMatchers("/api/syndic/**").hasAnyRole("SYNDIC", "BUSINESS")
-                it.requestMatchers("/api/condominium/**").hasRole("BUSINESS")
-                it.requestMatchers("/api/admin/**").hasRole("BUSINESS")
-                it.requestMatchers("/api/plan").permitAll()
-                it.requestMatchers("/api/plan/**").hasRole("BUSINESS")
+                it.requestMatchers("/api/v1/webhooks/**").permitAll()
+                it.requestMatchers("/api/v1/auth/**").permitAll()
+                it.requestMatchers("/api/v1/doorman/**").hasAnyRole("DOORMAN", "SYNDIC", "BUSINESS")
+                it.requestMatchers("/api/v1/syndic/**").hasAnyRole("SYNDIC", "BUSINESS")
+                it.requestMatchers("/api/v1/condominium/**").hasRole("BUSINESS")
+                it.requestMatchers("/api/v1/admin/**").hasRole("BUSINESS")
+                it.requestMatchers("/api/v1/plan").permitAll()
+                it.requestMatchers("/api/v1/plan/**").hasRole("BUSINESS")
                 it.anyRequest().authenticated()
             }
             .formLogin { it.disable() }
@@ -44,7 +45,10 @@ class SecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
 
-        configuration.allowedOriginPatterns = listOf("*")
+        configuration.allowedOrigins = listOf(
+            FRONTEND_URL,
+            SWAGGER_URL
+        )
 
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD")
         configuration.allowedHeaders = listOf("*")

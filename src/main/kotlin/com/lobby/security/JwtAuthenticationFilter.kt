@@ -2,6 +2,7 @@ package com.lobby.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.lobby.enums.AccountStatus
+import com.lobby.exceptions.UnauthorizedException
 import com.lobby.models.CustomUserDetails
 import com.lobby.repositories.AccountRepository
 import jakarta.servlet.FilterChain
@@ -44,23 +45,23 @@ class JwtAuthenticationFilter(
 
         val tokenVersion = jwtUtil.getTokenVersion(token)
         if (tokenVersion != user.tokenVersion) {
-            sendErrorJson(response, "Sessão expirada. Faça login novamente.")
+            throw UnauthorizedException("Sessão expirada. Faça login novamente.")
             return
         }
 
         if (user.accountStatus == AccountStatus.PENDING) {
-            sendErrorJson(response, "A sua conta ainda não foi aprovada, aguarde a liberação.")
+            throw UnauthorizedException("A sua conta ainda não foi aprovada, aguarde a liberação.")
             return
         }
 
         if (user.banned) {
             if (user.banExpiresAt == null) {
-                sendErrorJson(response, "Sua conta está permanentemente bloqueada.")
+                throw UnauthorizedException("Sua conta está permanentemente bloqueada.")
                 return
             }
 
             if (!user.isBanExpired()) {
-                sendErrorJson(response, "Conta temporariamente bloqueada. Tente mais tarde.")
+                throw UnauthorizedException("Conta temporariamente bloqueada. Tente mais tarde.")
                 return
             }
 
@@ -73,8 +74,8 @@ class JwtAuthenticationFilter(
             accountRepository.save(user)
         }
 
-        if (user.condominium?.isActive != true) {
-            sendErrorJson(response, "Condomínio temporariamente bloqueado. Tente novamente mais tarde.")
+        if (user.condominium != null && user.condominium?.isActive != true) {
+            throw UnauthorizedException("Condomínio temporariamente bloqueado. Tente novamente mais tarde.")
         }
 
         val authorities = listOf(SimpleGrantedAuthority("ROLE_${user.role.name.uppercase()}"))
@@ -86,18 +87,5 @@ class JwtAuthenticationFilter(
         SecurityContextHolder.getContext().authentication = authentication
 
         filterChain.doFilter(request, response)
-    }
-
-    private fun sendErrorJson(response: HttpServletResponse, message: String) {
-        response.status = HttpServletResponse.SC_UNAUTHORIZED
-        response.contentType = "application/json"
-        response.characterEncoding = "UTF-8"
-
-        val jsonPayload = mapOf(
-            "success" to false,
-            "message" to message
-        )
-
-        response.writer.write(objectMapper.writeValueAsString(jsonPayload))
     }
 }

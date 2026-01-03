@@ -21,5 +21,5 @@ interface AccountRepository : JpaRepository<User, Long> {
     fun findByCondominiumAndUsernameOrEmail(condominium: Condominium, username: String, email: String): User?
     fun findByCondominiumAndBanned(condominium: Condominium, banned: Boolean): List<User>?
     fun findByCondominiumAndAccountStatus(condominium: Condominium, accountStatus: AccountStatus): List<User>?
-    fun findByCondominiumAndApartmentNumber(condominium: Condominium, apartmentNumber: String): List<User>?
+    fun findByCondominiumAndBlockAndApartmentNumber(condominium: Condominium, block: String, apartmentNumber: String): List<User>?
 }

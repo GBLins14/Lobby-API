@@ -4,6 +4,7 @@ import com.lobby.annotations.CurrentUser
 import com.lobby.dto.SubscriptionRequest
 import com.lobby.exceptions.BadRequestException
 import com.lobby.extensions.error
+import com.lobby.extensions.success
 import com.lobby.models.User
 import com.lobby.services.PlanService
 import io.swagger.v3.oas.annotations.security.SecurityRequirements
@@ -35,15 +36,7 @@ class PlanController(
 
     @PostMapping("/cancel")
     fun planCancel(@CurrentUser user: User): ResponseEntity<Any> {
-        return try {
-            planService.planCancel(user)
-            ResponseEntity.ok().body(mapOf("message" to "Assinatura cancelada com sucesso. Sentiremos sua falta!"))
-        } catch (e: BadRequestException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).error("${e.message}")
-        } catch (e: Exception) {
-            e.printStackTrace()
-            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(mapOf("error" to "Não foi possível cancelar o seu plano no momento. Tente novamente mais tarde."))
-        }
+        planService.planCancel(user)
+        return ResponseEntity.ok().success("Assinatura cancelada com sucesso. Sentiremos sua falta!")
     }
 }

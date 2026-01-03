@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Configuration
     ),
     servers = [
         Server(url = "/", description = "Default Server URL"),
-        Server(url = "https://lobby-api-production.up.railway.app", description = "Production (Railway)")
     ],
     security = [SecurityRequirement(name = "bearerAuth")]
 )

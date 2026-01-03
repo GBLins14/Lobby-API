@@ -20,7 +20,7 @@ class DoormanController(
     }
 
     @PostMapping
-    fun create(@RequestBody request: CreateDeliveryDto, @CurrentUser user: User): ResponseEntity<Any> {
+    fun createDelivery(@RequestBody request: CreateDeliveryDto, @CurrentUser user: User): ResponseEntity<Any> {
         doormanService.registerDelivery(request, user.condominium!!, user.username)
         return ResponseEntity.ok().success("Encomenda criada com sucesso!")
     }

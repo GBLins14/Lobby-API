@@ -82,6 +82,7 @@ data class User(
         this.fullName = this.fullName?.uppercase()
         this.username = this.username.lowercase()
         this.email = this.email.lowercase()
+        this.block = this.block?.uppercase()?.trim()
         this.apartmentNumber = this.apartmentNumber?.uppercase()?.replace(Regex("[^A-Z0-9]"), "")
     }
 

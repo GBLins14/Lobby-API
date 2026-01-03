@@ -16,12 +16,10 @@ import org.springframework.stereotype.Service
 
 @Service
 class PlanService(
-    private val accountRepository: AccountRepository,
-    private val condominiumRepository: CondominiumRepository,
     @Value("\${stripe.plans.basic}") private val STRIPE_PLAN_BASIC: String,
     @Value("\${stripe.plans.professional}") private val STRIPE_PLAN_PROFESSIONAL: String,
     @Value("\${stripe.plans.premium}") private val STRIPE_PLAN_PREMIUM: String,
-    @Value("\${app.frontend-url}") private val FRONTEND_URL: String,
+    @Value("\${app.frontend-url}") private val FRONTEND_URL: String
 ) {
     fun getAllPlans(): ResponseEntity<Any> {
         val allPlans = SubscriptionPlan.entries.map { it.name }

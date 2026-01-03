@@ -36,7 +36,9 @@ data class Delivery(
     @Column(nullable = false)
     val recipientName: String,
 
-    var apartmentNumber: String? = null,
+    var block: String,
+
+    var apartmentNumber: String,
 
     @ManyToOne
     @JoinColumn(name = "doorman_id", nullable = false)
@@ -54,7 +56,8 @@ data class Delivery(
     @PrePersist
     @PreUpdate
     fun formatData() {
-        this.apartmentNumber = this.apartmentNumber?.uppercase()?.replace(Regex("[^A-Z0-9]"), "")
+        this.block = this.block.uppercase().trim()
+        this.apartmentNumber = this.apartmentNumber.uppercase().replace(Regex("[^A-Z0-9]"), "")
     }
 }
 

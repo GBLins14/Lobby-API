@@ -6,6 +6,7 @@ import com.lobby.dto.DeliveryResponseDto
 import com.lobby.dto.toListResponse
 import com.lobby.dto.toResponse
 import com.lobby.enums.DeliveryStatus
+import com.lobby.exceptions.BadRequestException
 import com.lobby.exceptions.ConflictException
 import com.lobby.exceptions.NotFoundException
 import com.lobby.exceptions.UnauthorizedException
@@ -42,11 +43,15 @@ class DoormanService(
         val doorman = accountRepository.findByUsername(doormanUsername)
             ?: throw UnauthorizedException("Ocorreu um erro com sua conta, tente novamente mais tarde.")
 
-        val apartmentNumber = request.apartmentNumber?.uppercase()?.replace(Regex("[^A-Z0-9]"), "")
+        val block = request.block.uppercase().trim()
+        val apartmentNumber = request.apartmentNumber.uppercase().replace(Regex("[^A-Z0-9]"), "")
 
-        val residents = apartmentNumber?.let { apt ->
-            accountRepository.findByCondominiumAndApartmentNumber(condominium, apt)
-        } ?: emptyList()
+        val residents = accountRepository.findByCondominiumAndBlockAndApartmentNumber(condominium, block, apartmentNumber)
+            ?: emptyList()
+
+        if (residents.isEmpty()) {
+            throw NotFoundException("Nenhum morador encontrado para este bloco/apartamento.")
+        }
 
         val trackingCode = generateCode()
 
@@ -54,6 +59,7 @@ class DoormanService(
             condominium = condominium,
             trackingCode = trackingCode,
             recipientName = request.recipientName,
+            block = block,
             apartmentNumber = apartmentNumber,
             doorman = doorman,
             status = DeliveryStatus.WAITING_PICKUP

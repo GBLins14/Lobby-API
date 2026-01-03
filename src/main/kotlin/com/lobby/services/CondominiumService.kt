@@ -27,7 +27,7 @@ class CondominiumService(
     @Value("\${app.condominium.max-condominium_name_length}") private val MAX_CONDOMINIUM_NAME_LENGTH: Int
 ) {
     @Transactional
-    fun signUp(user: User, request: SignUpCondominiumDto): String {
+    fun signUp(user: User, request: SignUpCondominiumDto): Condominium {
         val cleanedCnpj = validatorUtil.cleanCpfOrCnpj(request.cnpj)
 
         val userPlan = user.subscriptionPlan
@@ -102,6 +102,6 @@ class CondominiumService(
         }
         accountRepository.save(user)
 
-        return condominiumCode
+        return condominium
     }
 }

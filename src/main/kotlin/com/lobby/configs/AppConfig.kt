@@ -24,6 +24,7 @@ class AppConfig : WebMvcConfigurer {
     override fun configurePathMatch(configurer: PathMatchConfigurer) {
         configurer.addPathPrefix("/api",
             HandlerTypePredicate.forAnnotation(RestController::class.java)
+                .and(HandlerTypePredicate.forBasePackage("com.lobby"))
         )
     }
 }
