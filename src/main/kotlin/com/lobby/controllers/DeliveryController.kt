@@ -13,7 +13,7 @@ class DeliveryController(
 ) {
     @GetMapping
     fun listMyDeliveries(@CurrentUser user: User): ResponseEntity<Any> {
-        val deliveries = deliveryService.listMyDeliveries(user.condominium, user.block, user.apartmentNumber!!)
+        val deliveries = deliveryService.listMyDeliveries(user.condominium, user.block, user.apartmentNumber)
         return ResponseEntity.ok(deliveries)
     }
 }

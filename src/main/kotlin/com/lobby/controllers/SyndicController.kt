@@ -33,7 +33,7 @@ class SyndicController(
 
     @PatchMapping("/accounts/approve/{accountId}")
     fun approveAccount(@PathVariable accountId: Long, @CurrentUser user: User): ResponseEntity<Any> {
-        syndicService.approveAccount(user.condominium!!, accountId)
+        syndicService.approveAccount(user.condominium!!, accountId, user)
         return ResponseEntity.ok().success("Conta aprovada com sucesso! O usuário já pode fazer login.")
     }
 
@@ -57,13 +57,13 @@ class SyndicController(
 
     @PatchMapping("/accounts/ban")
     fun banAccount(@RequestBody request: BanDto, @CurrentUser user: User): ResponseEntity<Any> {
-        syndicService.banAccount(user.condominium!!, request)
+        syndicService.banAccount(user.condominium!!, request, user)
         return ResponseEntity.ok().success("Conta bloqueada com sucesso.")
     }
 
     @PatchMapping("/accounts/unban/{accountId}")
     fun unbanAccount(@PathVariable accountId: Long, @CurrentUser user: User): ResponseEntity<Any> {
-        syndicService.unbanAccount(user.condominium!!, accountId)
+        syndicService.unbanAccount(user.condominium!!, accountId, user)
         return ResponseEntity.ok().success("Conta desbloqueada com sucesso.")
     }
 
@@ -75,7 +75,7 @@ class SyndicController(
 
     @DeleteMapping("/accounts/{accountId}")
     fun delAccount(@PathVariable accountId: Long, @CurrentUser user: User): ResponseEntity<Any> {
-        syndicService.deleteAccount(user.condominium!!, accountId)
+        syndicService.deleteAccount(user.condominium!!, accountId, user)
         return ResponseEntity.ok().success("Conta deletada com sucesso.")
     }
 }

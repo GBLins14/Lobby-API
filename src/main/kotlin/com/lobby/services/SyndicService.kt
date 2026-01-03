@@ -61,74 +61,68 @@ class SyndicService(
     }
 
     @Transactional
-    fun approveAccount(condominium: Condominium, accountId: Long) {
-        val account = findAccountOrThrow(condominium, accountId)
-        validateHierarchy(account)
+    fun approveAccount(condominium: Condominium, accountId: Long, syndicAccount: User) {
+        val targetAccount = findAccountOrThrow(condominium, accountId)
+        validateHierarchy(syndicAccount, targetAccount)
 
-        if (account.accountStatus == AccountStatus.APPROVED) {
+        if (targetAccount.accountStatus == AccountStatus.APPROVED) {
             throw ConflictException("Esta conta já está aprovada.")
         }
 
-        account.accountStatus = AccountStatus.APPROVED
-        accountRepository.save(account)
+        targetAccount.accountStatus = AccountStatus.APPROVED
+        accountRepository.save(targetAccount)
     }
 
     @Transactional
-    fun updateRole(condominium: Condominium, request: SetRoleDto, user: User) {
-        val account = findAccountOrThrow(condominium, request.id)
-        validateHierarchy(account)
+    fun updateRole(condominium: Condominium, request: SetRoleDto, syndicAccount: User) {
+        val targetAccount = findAccountOrThrow(condominium, request.id)
+        validateHierarchy(syndicAccount, targetAccount)
 
-        if (user.role == Role.BUSINESS) {
-            if (request.role == Role.BUSINESS) {
-                throw UnauthorizedException("Você não pode promover alguém a este nível.")
-            }
-        } else {
-            if (request.role == Role.SYNDIC || request.role == Role.BUSINESS) {
-                throw UnauthorizedException("Você não pode promover alguém a este nível.")
-            }
+        if (request.role == Role.SYNDIC || request.role == Role.BUSINESS) {
+            throw UnauthorizedException("Você não pode promover alguém a este nível.")
         }
 
-        if (account.role == request.role) {
+        if (targetAccount.role == request.role) {
             throw ConflictException("A conta já está com este cargo.")
         }
 
-        account.role = request.role
-        accountRepository.save(account)
+        targetAccount.role = request.role
+        accountRepository.save(targetAccount)
     }
 
     @Transactional
-    fun banAccount(condominium: Condominium, request: BanDto) {
-        val account = findAccountOrThrow(condominium, request.id)
-        validateHierarchy(account)
+    fun banAccount(condominium: Condominium, request: BanDto, syndicAccount: User) {
+        val targetAccount = findAccountOrThrow(condominium, request.id)
+        validateHierarchy(syndicAccount, targetAccount)
 
-        if (!account.isBanExpired()) {
+        if (targetAccount.banned) {
             throw ConflictException("Esta conta já está bloqueada.")
         }
 
         val now = Instant.now()
-        account.apply {
+        targetAccount.apply {
             banned = true
             bannedAt = if (request.duration == null) null else now
             banExpiresAt = if (request.duration == null) null else now.plus(request.duration, request.unit)
             tokenVersion += 1
         }
 
-        accountRepository.save(account)
+        accountRepository.save(targetAccount)
     }
 
     @Transactional
-    fun unbanAccount(condominium: Condominium, accountId: Long) {
-        val account = findAccountOrThrow(condominium, accountId)
-        validateHierarchy(account)
+    fun unbanAccount(condominium: Condominium, accountId: Long, syndicAccount: User) {
+        val targetAccount = findAccountOrThrow(condominium, accountId)
+        validateHierarchy(syndicAccount, targetAccount)
 
-        if (!account.banned) {
+        if (!targetAccount.banned) {
             throw BadRequestException("A conta não está banida.")
         }
 
-        account.banned = false
-        account.bannedAt = null
-        account.banExpiresAt = null
-        accountRepository.save(account)
+        targetAccount.banned = false
+        targetAccount.bannedAt = null
+        targetAccount.banExpiresAt = null
+        accountRepository.save(targetAccount)
     }
 
     fun getBannedAccounts(condominium: Condominium): List<UserResponse> {
@@ -142,16 +136,11 @@ class SyndicService(
     }
 
     @Transactional
-    fun deleteAccount(condominium: Condominium, accountId: Long) {
-        val account = findAccountOrThrow(condominium, accountId)
-        validateHierarchy(account)
+    fun deleteAccount(condominium: Condominium, accountId: Long, syndicAccount: User) {
+        val targetAccount = findAccountOrThrow(condominium, accountId)
+        validateHierarchy(syndicAccount, targetAccount)
 
-        val auth = SecurityContextHolder.getContext().authentication?.principal
-        if (auth is CustomUserDetails && auth.user.id == account.id) {
-            throw ConflictException("Você não pode deletar sua própria conta enquanto logado.")
-        }
-
-        accountRepository.delete(account)
+        accountRepository.delete(targetAccount)
     }
 
     private fun findAccountOrThrow(condominium: Condominium, id: Long): User {
@@ -159,7 +148,11 @@ class SyndicService(
             ?: throw NotFoundException("Conta não encontrada.")
     }
 
-    private fun validateHierarchy(targetAccount: User) {
+    private fun validateHierarchy(syndicAccount: User, targetAccount: User) {
+        if (targetAccount == syndicAccount) {
+            throw ConflictException("Você não pode editar sua própria conta enquanto logado.")
+        }
+
         if (targetAccount.role == Role.BUSINESS || targetAccount.role == Role.SYNDIC) {
             throw UnauthorizedException("Você não tem permissão para gerenciar um usuário com cargo igual ou superior ao seu.")
         }

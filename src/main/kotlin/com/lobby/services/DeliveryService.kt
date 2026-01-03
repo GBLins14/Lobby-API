@@ -13,9 +13,10 @@ class DeliveryService(
     private val deliveryRepository: DeliveryRepository
 ) {
     fun listMyDeliveries(condominium: Condominium?, block: String?, apartmentNumber: String?): List<DeliveryResponseDto> {
-        if (apartmentNumber == null || block == null) {
+        if (apartmentNumber.isNullOrBlank() || block.isNullOrBlank()) {
             throw NotFoundException("Nenhuma encomenda encontrada.")
         }
+
         if (condominium == null) {
             throw BadRequestException("Você não está registrado em nenhum condomínio.")
         }

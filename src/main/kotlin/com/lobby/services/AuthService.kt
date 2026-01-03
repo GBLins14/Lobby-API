@@ -150,7 +150,7 @@ class AuthService(
             }
 
             if (!user.isBanExpired()) {
-                throw UnauthorizedException("Conta temporariamente bloqueada. Tente mais tarde.")
+                throw UnauthorizedException("Conta temporariamente bloqueada. Tente novamente mais tarde.")
             }
 
             user.apply {

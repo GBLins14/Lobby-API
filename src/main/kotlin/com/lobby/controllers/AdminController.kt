@@ -55,7 +55,7 @@ class AdminController(
 
     @PatchMapping("/accounts/role")
     fun setRole(@RequestBody request: SetRoleDto, @CurrentUser user: User): ResponseEntity<Any> {
-        syndicService.updateRole(user.condominium!!, request, user)
+        adminService.updateRole(user.condominium!!, request, user)
         return ResponseEntity.ok().success("Cargo atualizado com sucesso!")
     }
 

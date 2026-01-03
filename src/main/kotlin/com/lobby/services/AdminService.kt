@@ -3,6 +3,7 @@ package com.lobby.services
 import com.lobby.dto.BanDto
 import com.lobby.dto.SetRoleDto
 import com.lobby.enums.AccountStatus
+import com.lobby.enums.Role
 import com.lobby.exceptions.BadRequestException
 import com.lobby.exceptions.ConflictException
 import com.lobby.exceptions.NotFoundException
@@ -39,6 +40,23 @@ class AdminService(
 
         account.accountStatus = AccountStatus.APPROVED
         accountRepository.save(account)
+    }
+
+    @Transactional
+    fun updateRole(condominium: Condominium, request: SetRoleDto, adminAccount: User) {
+        val targetAccount = findAccountOrThrow(condominium, request.id)
+        validateHierarchy(adminAccount, targetAccount)
+
+        if (request.role == Role.SYNDIC || request.role == Role.BUSINESS) {
+            throw UnauthorizedException("Você não pode promover alguém a este nível.")
+        }
+
+        if (targetAccount.role == request.role) {
+            throw ConflictException("A conta já está com este cargo.")
+        }
+
+        targetAccount.role = request.role
+        accountRepository.save(targetAccount)
     }
 
     @Transactional
@@ -106,5 +124,20 @@ class AdminService(
         }
 
         accountRepository.delete(account)
+    }
+
+    private fun findAccountOrThrow(condominium: Condominium, id: Long): User {
+        return accountRepository.findByCondominiumAndId(condominium, id)
+            ?: throw NotFoundException("Conta não encontrada.")
+    }
+
+    private fun validateHierarchy(adminAccount: User, targetAccount: User) {
+        if (targetAccount == adminAccount) {
+            throw ConflictException("Você não pode editar sua própria conta enquanto logado.")
+        }
+
+        if (targetAccount.role == Role.BUSINESS) {
+            throw UnauthorizedException("Você não tem permissão para gerenciar um usuário com cargo igual ou superior ao seu.")
+        }
     }
 }
