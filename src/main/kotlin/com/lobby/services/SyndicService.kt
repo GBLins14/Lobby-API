@@ -13,12 +13,10 @@ import com.lobby.exceptions.ConflictException
 import com.lobby.exceptions.NotFoundException
 import com.lobby.exceptions.UnauthorizedException
 import com.lobby.models.Condominium
-import com.lobby.models.CustomUserDetails
 import com.lobby.models.User
 import com.lobby.repositories.AccountRepository
 import com.lobby.repositories.DeliveryRepository
 import jakarta.transaction.Transactional
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.time.Instant
 

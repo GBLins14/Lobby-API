@@ -32,9 +32,9 @@ class AuthController(
 
     @PostMapping("/sign-in")
     @SecurityRequirements
-    fun signIn(@RequestBody request: SignInDto): ResponseEntity<String> {
+    fun signIn(@RequestBody request: SignInDto): ResponseEntity<Any> {
         val token = authService.login(request)
-        return ResponseEntity.ok(token)
+        return ResponseEntity.ok(mapOf("success" to true, "token" to token))
     }
 
     @PostMapping("/forgot-password")

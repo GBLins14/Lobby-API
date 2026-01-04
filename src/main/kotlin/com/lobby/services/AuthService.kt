@@ -94,10 +94,6 @@ class AuthService(
             throw BadRequestException("Para se cadastrar como morador, porteiro ou síndico, é obrigatório informar o código do condomínio.")
         }
 
-        if (condominium != null && request.role == Role.BUSINESS) {
-            throw UnauthorizedException("Você não pode criar uma conta empresarial estando registrado em um condomínio existente.")
-        }
-
         val (accountStatus, finalRole, messageReturn) = when (request.role) {
             Role.BUSINESS -> Triple(
                 AccountStatus.CREATING,

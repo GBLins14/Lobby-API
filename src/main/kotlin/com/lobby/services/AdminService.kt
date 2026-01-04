@@ -8,15 +8,11 @@ import com.lobby.exceptions.BadRequestException
 import com.lobby.exceptions.ConflictException
 import com.lobby.exceptions.NotFoundException
 import com.lobby.exceptions.UnauthorizedException
-import com.lobby.extensions.error
-import com.lobby.extensions.success
 import com.lobby.models.Condominium
 import com.lobby.models.CustomUserDetails
 import com.lobby.models.User
 import com.lobby.repositories.AccountRepository
 import jakarta.transaction.Transactional
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -86,8 +82,6 @@ class AdminService(
 
         account.tokenVersion += 1
         accountRepository.save(account)
-
-        val typeMsg = if (request.duration == null) "Permanente" else "${request.duration} ${request.unit}"
     }
 
     @Transactional
