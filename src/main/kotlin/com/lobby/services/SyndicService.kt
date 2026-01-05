@@ -16,6 +16,8 @@ import com.lobby.models.Condominium
 import com.lobby.models.User
 import com.lobby.repositories.AccountRepository
 import com.lobby.repositories.DeliveryRepository
+import com.lobby.utils.FindAccountOrThrow
+import com.lobby.utils.validateHierarchy
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -23,7 +25,8 @@ import java.time.Instant
 @Service
 class SyndicService(
     private val accountRepository: AccountRepository,
-    private val deliveryRepository: DeliveryRepository
+    private val deliveryRepository: DeliveryRepository,
+    private val findAccountOrThrow: FindAccountOrThrow
 ) {
 
     fun getAllDeliveries(condominium: Condominium): List<DeliveryListDto> =
@@ -60,7 +63,7 @@ class SyndicService(
 
     @Transactional
     fun approveAccount(condominium: Condominium, accountId: Long, syndicAccount: User) {
-        val targetAccount = findAccountOrThrow(condominium, accountId)
+        val targetAccount = findAccountOrThrow.findAccount(condominium, accountId)
         validateHierarchy(syndicAccount, targetAccount)
 
         if (targetAccount.accountStatus == AccountStatus.APPROVED) {
@@ -73,7 +76,7 @@ class SyndicService(
 
     @Transactional
     fun updateRole(condominium: Condominium, request: SetRoleDto, syndicAccount: User) {
-        val targetAccount = findAccountOrThrow(condominium, request.id)
+        val targetAccount = findAccountOrThrow.findAccount(condominium, request.id)
         validateHierarchy(syndicAccount, targetAccount)
 
         if (request.role == Role.SYNDIC || request.role == Role.BUSINESS) {
@@ -90,7 +93,7 @@ class SyndicService(
 
     @Transactional
     fun banAccount(condominium: Condominium, request: BanDto, syndicAccount: User) {
-        val targetAccount = findAccountOrThrow(condominium, request.id)
+        val targetAccount = findAccountOrThrow.findAccount(condominium, request.id)
         validateHierarchy(syndicAccount, targetAccount)
 
         if (targetAccount.banned) {
@@ -110,7 +113,7 @@ class SyndicService(
 
     @Transactional
     fun unbanAccount(condominium: Condominium, accountId: Long, syndicAccount: User) {
-        val targetAccount = findAccountOrThrow(condominium, accountId)
+        val targetAccount = findAccountOrThrow.findAccount(condominium, accountId)
         validateHierarchy(syndicAccount, targetAccount)
 
         if (!targetAccount.banned) {
@@ -135,24 +138,9 @@ class SyndicService(
 
     @Transactional
     fun deleteAccount(condominium: Condominium, accountId: Long, syndicAccount: User) {
-        val targetAccount = findAccountOrThrow(condominium, accountId)
+        val targetAccount = findAccountOrThrow.findAccount(condominium, accountId)
         validateHierarchy(syndicAccount, targetAccount)
 
         accountRepository.delete(targetAccount)
-    }
-
-    private fun findAccountOrThrow(condominium: Condominium, id: Long): User {
-        return accountRepository.findByCondominiumAndId(condominium, id)
-            ?: throw NotFoundException("Conta não encontrada.")
-    }
-
-    private fun validateHierarchy(syndicAccount: User, targetAccount: User) {
-        if (targetAccount == syndicAccount) {
-            throw ConflictException("Você não pode editar sua própria conta enquanto logado.")
-        }
-
-        if (targetAccount.role == Role.BUSINESS || targetAccount.role == Role.SYNDIC) {
-            throw UnauthorizedException("Você não tem permissão para gerenciar um usuário com cargo igual ou superior ao seu.")
-        }
     }
 }

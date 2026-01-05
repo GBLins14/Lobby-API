@@ -12,6 +12,8 @@ import com.lobby.models.Condominium
 import com.lobby.models.CustomUserDetails
 import com.lobby.models.User
 import com.lobby.repositories.AccountRepository
+import com.lobby.utils.FindAccountOrThrow
+import com.lobby.utils.validateHierarchy
 import jakarta.transaction.Transactional
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
@@ -19,7 +21,8 @@ import java.time.Instant
 
 @Service
 class AdminService(
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val findAccountOrThrow: FindAccountOrThrow
 ) {
     @Transactional
     fun approveAccount(condominium: Condominium, accountId: Long, user: User) {
@@ -40,7 +43,7 @@ class AdminService(
 
     @Transactional
     fun updateRole(condominium: Condominium, request: SetRoleDto, adminAccount: User) {
-        val targetAccount = findAccountOrThrow(condominium, request.id)
+        val targetAccount = findAccountOrThrow.findAccount(condominium, request.id)
         validateHierarchy(adminAccount, targetAccount)
 
         if (request.role == Role.SYNDIC || request.role == Role.BUSINESS) {
@@ -118,20 +121,5 @@ class AdminService(
         }
 
         accountRepository.delete(account)
-    }
-
-    private fun findAccountOrThrow(condominium: Condominium, id: Long): User {
-        return accountRepository.findByCondominiumAndId(condominium, id)
-            ?: throw NotFoundException("Conta não encontrada.")
-    }
-
-    private fun validateHierarchy(adminAccount: User, targetAccount: User) {
-        if (targetAccount == adminAccount) {
-            throw ConflictException("Você não pode editar sua própria conta enquanto logado.")
-        }
-
-        if (targetAccount.role == Role.BUSINESS) {
-            throw UnauthorizedException("Você não tem permissão para gerenciar um usuário com cargo igual ou superior ao seu.")
-        }
     }
 }

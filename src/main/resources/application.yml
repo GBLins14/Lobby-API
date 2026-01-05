@@ -27,6 +27,7 @@ app:
   condominium:
     min-condominium_name_length: ${APP_MIN_CONDOMINIUM_NAME_LENGTH}
     max-condominium_name_length: ${APP_MAX_CONDOMINIUM_NAME_LENGTH}
+    max-accounts_per_apartment: ${APP_MAX_ACCOUNTS_PER_APARTMENT}
 
   password-recovery:
     token-expiration-minutes: ${APP_TOKEN_EXPIRATION_MINUTES}

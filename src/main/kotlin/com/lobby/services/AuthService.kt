@@ -7,6 +7,7 @@ import com.lobby.enums.AccountStatus
 import com.lobby.dto.toResponseDTO
 import com.lobby.enums.Role
 import com.lobby.exceptions.BadRequestException
+import com.lobby.exceptions.ForbiddenException
 import com.lobby.exceptions.NotFoundException
 import com.lobby.exceptions.UnauthorizedException
 import com.lobby.models.User
@@ -43,11 +44,16 @@ class AuthService(
     @Value("\${app.sign.min-password-length}") private val MIN_PASSWORD_LENGTH: Int,
     @Value("\${app.sign.max-password-length}") private val MAX_PASSWORD_LENGTH: Int,
     @Value("\${app.sign.max-attempts}") private val MAX_ATTEMPTS: Int,
-    @Value("\${app.sign.lockout-minutes}") private val LOCKOUT_MINUTES: Long
+    @Value("\${app.sign.lockout-minutes}") private val LOCKOUT_MINUTES: Long,
+    @Value("\${app.condominium.max-accounts_per_apartment}") private val MAX_ACCOUNTS_PER_APARTMENT: Long,
 ) {
+    private val logger = LoggerFactory.getLogger(AuthService::class.java)
+
     @Transactional
     fun register(request: SignUpDto): String {
         val cleanedCpf = validatorUtil.cleanCpfOrCnpj(request.cpf)
+        val block = request.block?.uppercase()?.trim()
+        val apartmentNumber = request.apartmentNumber?.uppercase()?.replace(Regex("[^A-Z0-9]"), "")
 
         if (request.fullName.length < MIN_FULLNAME_LENGTH) {
             throw BadRequestException("É necessário inserir o seu nome completo.")
@@ -94,6 +100,18 @@ class AuthService(
             throw BadRequestException("Para se cadastrar como morador, porteiro ou síndico, é obrigatório informar o código do condomínio.")
         }
 
+        if (request.role == Role.RESIDENT || request.role == Role.SYNDIC) {
+            if (block.isNullOrBlank() || apartmentNumber.isNullOrBlank()) {
+                throw BadRequestException("Para se cadastrar como morador ou síndico, é obrigatório informar o seu bloco e o seu apartamento.")
+            }
+
+            val residentsCount = accountRepository.countByCondominiumAndBlockAndApartmentNumber(condominium!!, block, apartmentNumber)
+
+            if (residentsCount >= MAX_ACCOUNTS_PER_APARTMENT) {
+                throw ForbiddenException("O limite máximo de contas para este apartamento foi atingido.")
+            }
+        }
+
         val (accountStatus, finalRole, messageReturn) = when (request.role) {
             Role.BUSINESS -> Triple(
                 AccountStatus.CREATING,
@@ -124,8 +142,8 @@ class AuthService(
             email = request.email,
             phone = request.phone,
             condominium = condominium,
-            block = if (finalRole == Role.BUSINESS || finalRole == Role.DOORMAN) null else request.block,
-            apartmentNumber = if (finalRole == Role.BUSINESS || finalRole == Role.DOORMAN) null else request.apartmentNumber,
+            block = if (finalRole == Role.BUSINESS || finalRole == Role.DOORMAN) null else block,
+            apartmentNumber = if (finalRole == Role.BUSINESS || finalRole == Role.DOORMAN) null else apartmentNumber,
             hashedPassword = bcrypt.encodePassword(request.password),
             role = finalRole,
             accountStatus = accountStatus
@@ -187,8 +205,6 @@ class AuthService(
 
         return token
     }
-
-    val logger = LoggerFactory.getLogger(AuthService::class.java)
 
     @Transactional
     fun processForgotPassword(email: String) {
