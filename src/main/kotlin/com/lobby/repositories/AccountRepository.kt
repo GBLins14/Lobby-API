@@ -13,7 +13,6 @@ interface AccountRepository : JpaRepository<User, Long> {
     fun findByEmail(email: String): User?
     fun findByPhone(phone: String): User?
     fun findAllByCondominium(condominium: Condominium): List<User>
-    fun findAllByCondominiumAndBlockAndApartmentNumber(condominium: Condominium, block: String, apartmentNumber: String): List<User>?
     fun findByCondominiumAndId(condominium: Condominium, accountId: Long): User?
     fun findByCondominiumAndUsernameOrEmail(condominium: Condominium, username: String, email: String): User?
     fun findByCondominiumAndBanned(condominium: Condominium, banned: Boolean): List<User>?
