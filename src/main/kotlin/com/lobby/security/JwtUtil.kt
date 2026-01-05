@@ -6,17 +6,18 @@ import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.util.*
+import java.time.Duration
 
 @Component
 class JwtUtil(
     @Value("\${jwt.jwt-secret}") private val secret: String,
-    @Value("\${jwt.jwt-expiration-ms}") private val expirationMs: Long
+    @Value("\${jwt.jwt-expiration-days}") private val expirationDays: Long
 ) {
     private val key = Keys.hmacShaKeyFor(secret.toByteArray())
 
     fun generateToken(username: String, role: Role, tokenVersion: Int): String {
         val now = Date()
-        val expiry = Date(now.time + expirationMs)
+        val expiry = Date(now.time + Duration.ofDays(expirationDays).toMillis())
 
         return Jwts.builder()
             .setSubject(username)

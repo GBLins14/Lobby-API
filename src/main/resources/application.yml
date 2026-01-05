@@ -53,5 +53,5 @@ spring:
 
 jwt:
   jwt-secret: ${SPRING_JWT_SECRET}
-  jwt-expiration-ms: ${SPRING_JWT_EXPIRATION_MS}
+  jwt-expiration-days: ${SPRING_JWT_EXPIRATION_DAYS}
 
