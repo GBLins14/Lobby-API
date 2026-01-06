@@ -44,6 +44,12 @@ class SyndicService(
         return accounts.map { it.toResponseDTO() }
     }
 
+    fun getAccountById(condominium: Condominium, id: Long): UserResponse {
+        val account = accountRepository.findByCondominiumAndId(condominium, id)
+            ?: throw NotFoundException("Conta não encontrada.")
+        return account.toResponseDTO()
+    }
+
     fun getAccountByLogin(condominium: Condominium, login: String): UserResponse {
         val account = accountRepository.findByCondominiumAndUsernameOrEmail(condominium, login, login)
             ?: throw NotFoundException("Conta não encontrada.")

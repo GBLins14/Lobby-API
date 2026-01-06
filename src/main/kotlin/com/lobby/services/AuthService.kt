@@ -101,11 +101,17 @@ class AuthService(
         }
 
         if (request.role == Role.RESIDENT || request.role == Role.SYNDIC) {
+            val apartmentsCount = accountRepository.countTotalUnits(condominium!!)
+
+            if (apartmentsCount >= condominium.subscriptionPlan.maxApartments) {
+                throw ForbiddenException("O limite máximo de apartamentos para este condomínio foi atingido.")
+            }
+
             if (block.isNullOrBlank() || apartmentNumber.isNullOrBlank()) {
                 throw BadRequestException("Para se cadastrar como morador ou síndico, é obrigatório informar o seu bloco e o seu apartamento.")
             }
 
-            val residentsCount = accountRepository.countByCondominiumAndBlockAndApartmentNumber(condominium!!, block, apartmentNumber)
+            val residentsCount = accountRepository.countByCondominiumAndBlockAndApartmentNumber(condominium, block, apartmentNumber)
 
             if (residentsCount >= MAX_ACCOUNTS_PER_APARTMENT) {
                 throw ForbiddenException("O limite máximo de contas para este apartamento foi atingido.")

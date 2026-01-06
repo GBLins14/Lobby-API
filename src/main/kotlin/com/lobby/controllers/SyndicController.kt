@@ -25,7 +25,7 @@ class SyndicController(
     @GetMapping("/accounts")
     fun getAccounts(@CurrentUser user: User) = syndicService.getAllAccounts(user.condominium!!)
 
-    @GetMapping("/accounts/pendant")
+    @GetMapping("/accounts/pendants")
     fun getPendantAccounts(@CurrentUser user: User): List<UserResponse> {
         val accounts = syndicService.getPendingAccounts(user.condominium!!)
         return accounts
@@ -35,6 +35,12 @@ class SyndicController(
     fun approveAccount(@PathVariable accountId: Long, @CurrentUser user: User): ResponseEntity<Any> {
         syndicService.approveAccount(user.condominium!!, accountId, user)
         return ResponseEntity.ok().success("Conta aprovada com sucesso! O usuário já pode fazer login.")
+    }
+
+    @GetMapping("/accounts/{accountId}")
+    fun getAccountById(@PathVariable id: Long, @CurrentUser user: User): UserResponse {
+        val account = syndicService.getAccountById(user.condominium!!, id)
+        return account
     }
 
     @GetMapping("/accounts/{login}")

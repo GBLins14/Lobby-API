@@ -11,7 +11,7 @@ data class DeliveryResponseDto(
     val recipientName: String,
     val block: String,
     val apartmentNumber: String,
-    val doormanId: Long,
+    val doormanFullName: String,
     val arrivalDate: Instant,
     val withdrawalDate: Instant?
 )
@@ -22,7 +22,7 @@ data class DeliveryListDto(
     val recipientName: String,
     val block: String,
     val apartmentNumber: String,
-    val doormanId: Long,
+    val doormanFullName: String,
     val arrivalDate: Instant,
     val withdrawalDate: Instant?
 )
@@ -35,7 +35,7 @@ fun Delivery.toResponse(): DeliveryResponseDto {
         recipientName = this.recipientName,
         block = this.block,
         apartmentNumber = this.apartmentNumber,
-        doormanId = this.doorman.id,
+        doormanFullName = this.doorman.fullName,
         arrivalDate = this.arrivalDate,
         withdrawalDate = this.withdrawalDate
     )
@@ -48,7 +48,7 @@ fun Delivery.toListResponse(): DeliveryListDto {
         recipientName = this.recipientName,
         block = this.block,
         apartmentNumber = this.apartmentNumber,
-        doormanId = this.doorman.id,
+        doormanFullName = this.doorman.fullName,
         arrivalDate = this.arrivalDate,
         withdrawalDate = this.withdrawalDate
     )

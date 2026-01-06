@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
 import jakarta.persistence.PrePersist
 import jakarta.persistence.PreUpdate
 import jakarta.persistence.Table
@@ -40,8 +41,9 @@ data class Delivery(
 
     var apartmentNumber: String,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doorman_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     val doorman: User,
 
     @Enumerated(EnumType.STRING)

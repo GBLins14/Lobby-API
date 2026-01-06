@@ -20,7 +20,7 @@ data class User(
     @Column(nullable = false, unique = true)
     val cpf: String,
 
-    var fullName: String? = null,
+    var fullName: String,
 
     @Column(nullable = false, unique = true)
     var username: String,
@@ -79,7 +79,7 @@ data class User(
     @PrePersist
     @PreUpdate
     fun formatData() {
-        this.fullName = this.fullName?.uppercase()
+        this.fullName = this.fullName.uppercase()
         this.username = this.username.lowercase()
         this.email = this.email.lowercase()
         this.block = this.block?.uppercase()?.trim()
