@@ -4,13 +4,15 @@ services:
     container_name: lobby-postgres
     restart: always
     environment:
-      POSTGRES_DB: ${SPRING_DATASOURCE_URL}
+      POSTGRES_DB: lobby_db
       POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
       POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - lobby-network
 
   api:
     build: .
@@ -22,11 +24,12 @@ services:
       - db
     env_file:
       - .env
-
-    environment:
-      SPRING_DATASOURCE_URL: ${POSTGRES_DB}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+    networks:
+      - lobby-network
 
 volumes:
   postgres_data:
+
+networks:
+  lobby-network:
+    driver: bridge
