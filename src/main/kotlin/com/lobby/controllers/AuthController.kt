@@ -30,6 +30,12 @@ class AuthController(
         return ResponseEntity.status(HttpStatus.OK).success(messageReturn)
     }
 
+    @GetMapping("/ping")
+    @SecurityRequirements
+    fun ping(): String {
+        return "pong"
+    }
+
     @PostMapping("/sign-in")
     @SecurityRequirements
     fun signIn(@RequestBody request: SignInDto): ResponseEntity<Any> {
