@@ -11,6 +11,7 @@ import com.lobby.repositories.AccountRepository
 import com.lobby.repositories.CondominiumRepository
 import com.lobby.utils.checkDuplicate
 import com.lobby.utils.generateCode
+import com.lobby.utils.generateCondominiumCode
 import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -76,7 +77,7 @@ class CondominiumService(
             throw UnauthorizedException("O limite de apartamentos do seu plano atual é de ${userPlan.maxApartments}.")
         }
 
-        val condominiumCode = generateCode()
+        val condominiumCode = generateCondominiumCode()
 
         val condominium = Condominium(
             name = request.name,

@@ -8,3 +8,12 @@ fun generateCode(): String {
 
     return randomString
 }
+
+fun generateCondominiumCode(): String {
+    val characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    val randomString = (1..15) // Tamanho de 6 digitos
+        .map { characters.random() }
+        .joinToString("")
+
+    return randomString
+}
