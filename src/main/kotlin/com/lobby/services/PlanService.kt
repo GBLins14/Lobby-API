@@ -4,6 +4,7 @@ import com.lobby.enums.SubscriptionPlan
 import com.lobby.exceptions.BadRequestException
 import com.lobby.exceptions.NotFoundException
 import com.lobby.models.User
+import com.lobby.repositories.CondominiumRepository
 import com.stripe.model.checkout.Session
 import com.stripe.model.Subscription
 import com.stripe.param.checkout.SessionCreateParams
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class PlanService(
+    private val condominiumRepository: CondominiumRepository,
     @Value("\${stripe.plans.basic}") private val STRIPE_PLAN_BASIC: String,
     @Value("\${stripe.plans.professional}") private val STRIPE_PLAN_PROFESSIONAL: String,
     @Value("\${stripe.plans.premium}") private val STRIPE_PLAN_PREMIUM: String,
@@ -63,6 +65,9 @@ class PlanService(
 
         try {
             val subscription = Subscription.retrieve(subId)
+            if (user.condominium != null) {
+                condominiumRepository.delete(user.condominium!!)
+            }
             subscription.cancel()
         } catch (e: Exception) {
             throw RuntimeException("Erro ao cancelar na Stripe: ${e.message}")

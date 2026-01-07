@@ -60,31 +60,22 @@ class AdminService(
 
     @Transactional
     fun banAccount(condominium: Condominium, request: BanDto, user: User) {
-        if (user.condominium == null) {
-            throw UnauthorizedException("Você não está registrado em nenhum condomínio.")
-        }
+        val targetAccount = findAccountOrThrow.findAccount(condominium, request.id)
+        validateHierarchy(user, targetAccount)
 
-        val account = accountRepository.findByCondominiumAndId(condominium, request.id)
-            ?: throw NotFoundException("Conta não encontrada.")
-
-        if (!account.isBanExpired()) {
+        if (targetAccount.banned) {
             throw ConflictException("Esta conta já está bloqueada.")
         }
 
         val now = Instant.now()
-
-        if (request.duration == null || request.unit == null) {
-            account.banned = true
-            account.bannedAt = null
-            account.banExpiresAt = null
-        } else {
-            account.banned = true
-            account.bannedAt = now
-            account.banExpiresAt = now.plus(request.duration, request.unit)
+        targetAccount.apply {
+            banned = true
+            bannedAt = if (request.duration == null) null else now
+            banExpiresAt = if (request.duration == null) null else now.plus(request.duration, request.unit)
+            tokenVersion += 1
         }
 
-        account.tokenVersion += 1
-        accountRepository.save(account)
+        accountRepository.save(targetAccount)
     }
 
     @Transactional
