@@ -33,7 +33,7 @@ class PlanController(
 
     @PostMapping("/cancel")
     fun planCancel(@CurrentUser user: User): ResponseEntity<Any> {
-        planService.planCancel(user)
+        planService.cancelPlan(user)
         return ResponseEntity.ok().success("Assinatura cancelada com sucesso. Sentiremos sua falta!")
     }
 }

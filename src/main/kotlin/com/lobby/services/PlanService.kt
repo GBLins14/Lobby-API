@@ -5,10 +5,10 @@ import com.lobby.exceptions.BadRequestException
 import com.lobby.exceptions.NotFoundException
 import com.lobby.models.User
 import com.lobby.repositories.CondominiumRepository
+import com.lobby.utils.CancelLocalPlan
+import com.lobby.utils.cancelStripeSubscription
 import com.stripe.model.checkout.Session
-import com.stripe.model.Subscription
 import com.stripe.param.checkout.SessionCreateParams
-import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service
 @Service
 class PlanService(
     private val condominiumRepository: CondominiumRepository,
+    private val cancelLocalPlan: CancelLocalPlan,
     @Value("\${stripe.plans.basic}") private val STRIPE_PLAN_BASIC: String,
     @Value("\${stripe.plans.professional}") private val STRIPE_PLAN_PROFESSIONAL: String,
     @Value("\${stripe.plans.premium}") private val STRIPE_PLAN_PREMIUM: String,
@@ -55,22 +56,18 @@ class PlanService(
         return session.url
     }
 
-    @Transactional
-    fun planCancel(user: User) {
+    fun cancelPlan(user: User) {
         val subId = user.stripeSubscriptionId
 
-        if (user.subscriptionPlan == null || subId == null) {
+        if (user.subscriptionPlan == null && subId == null) {
             throw BadRequestException("Você não tem nenhum plano ativo para cancelar.")
         }
 
-        try {
-            val subscription = Subscription.retrieve(subId)
-            if (user.condominium != null) {
-                condominiumRepository.delete(user.condominium!!)
-            }
-            subscription.cancel()
-        } catch (e: Exception) {
-            throw RuntimeException("Erro ao cancelar na Stripe: ${e.message}")
+        if (subId != null) {
+            cancelStripeSubscription(subId)
         }
+
+        cancelLocalPlan.cancel(user)
     }
+
 }
