@@ -211,7 +211,7 @@ class PlanNotificationService(
         """.trimIndent()
 
         val emailRequest = mapOf(
-            "from" to "Lobby Financeiro <billing@resend.dev>",
+            "from" to "Lobby <nao-responda@mail.uselobby.com.br>",
             "to" to listOf(email),
             "subject" to "Lobby: Ação necessária na sua assinatura",
             "html" to htmlContent

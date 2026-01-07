@@ -114,7 +114,7 @@ class ForgotPasswordService(
     """.trimIndent()
 
         val emailRequest = mapOf(
-            "from" to "Lobby App <onboarding@resend.dev>",
+            "from" to "Lobby <nao-responda@mail.uselobby.com.br>",
             "to" to listOf(email),
             "subject" to "Lobby: Recuperação de Senha",
             "html" to htmlContent

@@ -111,7 +111,7 @@ class NotificationService(
     """.trimIndent()
 
         val emailRequest = mapOf(
-            "from" to "Lobby App <onboarding@resend.dev>",
+            "from" to "Lobby <nao-responda@mail.uselobby.com.br>",
             "to" to listOf(email),
             "subject" to "📦 Chegou uma encomenda para você!",
             "html" to htmlContent

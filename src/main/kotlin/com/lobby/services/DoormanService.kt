@@ -85,7 +85,8 @@ class DoormanService(
 
     @Transactional
     fun confirmDelivery(condominium: Condominium, code: String) {
-        val delivery = deliveryRepository.findByCondominiumAndTrackingCode(condominium, code)
+        val trackingCode = code.uppercase().trim()
+        val delivery = deliveryRepository.findByCondominiumAndTrackingCode(condominium, trackingCode)
             ?: throw NotFoundException("Encomenda não encontrada.")
 
         if (delivery.status == DeliveryStatus.DELIVERED) {
