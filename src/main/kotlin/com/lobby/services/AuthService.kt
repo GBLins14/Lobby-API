@@ -54,6 +54,7 @@ class AuthService(
         val cleanedCpf = validatorUtil.cleanCpfOrCnpj(request.cpf)
         val block = request.block?.uppercase()?.trim()
         val apartmentNumber = request.apartmentNumber?.uppercase()?.replace(Regex("[^A-Z0-9]"), "")
+        val username = request.username.trim()
 
         if (request.fullName.length < MIN_FULLNAME_LENGTH) {
             throw BadRequestException("É necessário inserir o seu nome completo.")
@@ -63,7 +64,7 @@ class AuthService(
             throw BadRequestException("É necessário inserir um número de CPF que seja válido.")
         }
 
-        if (request.username.length !in MIN_USERNAME_LENGTH..MAX_USERNAME_LENGTH) {
+        if (username.length !in MIN_USERNAME_LENGTH..MAX_USERNAME_LENGTH) {
             throw BadRequestException("O nome de usuário deve conter no mínimo $MIN_USERNAME_LENGTH caracteres, e no máximo $MAX_USERNAME_LENGTH caracteres.")
         }
 
@@ -80,7 +81,7 @@ class AuthService(
         }
 
         val existingCpf = accountRepository.findByCpf(cleanedCpf)
-        val existingUsername = accountRepository.findByUsername(request.username)
+        val existingUsername = accountRepository.findByUsername(username)
         val existingEmail = accountRepository.findByEmail(request.email)
         val existingPhone = accountRepository.findByPhone(request.phone)
 
@@ -144,7 +145,7 @@ class AuthService(
         val user = User(
             cpf = cleanedCpf,
             fullName = request.fullName,
-            username = request.username,
+            username = username,
             email = request.email,
             phone = request.phone,
             condominium = condominium,
