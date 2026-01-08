@@ -1,5 +1,6 @@
 package com.lobby.services
 
+import com.lobby.enums.Role
 import com.lobby.enums.SubscriptionPlan
 import com.lobby.exceptions.BadRequestException
 import com.lobby.exceptions.NotFoundException
@@ -27,7 +28,11 @@ class PlanService(
         return ResponseEntity.ok(mapOf("success" to true, "plans" to allPlans))
     }
 
-    fun createSubscriptionSession(subscriptionPlan: SubscriptionPlan, userId: Long): String {
+    fun createSubscriptionSession(subscriptionPlan: SubscriptionPlan, user: User): String {
+        if (user.role != Role.BUSINESS) {
+            throw BadRequestException("Para contratar um plano, é necessário acessar uma conta empresarial.")
+        }
+
         val priceId = when(subscriptionPlan) {
             SubscriptionPlan.BASIC -> STRIPE_PLAN_BASIC
             SubscriptionPlan.PROFESSIONAL -> STRIPE_PLAN_PROFESSIONAL
@@ -47,7 +52,7 @@ class PlanService(
                     .setPrice(priceId)
                     .build()
             )
-            .putMetadata("userId", userId.toString())
+            .putMetadata("userId", user.id.toString())
             .putMetadata("subscriptionPlan", subscriptionPlan.toString())
             .build()
 

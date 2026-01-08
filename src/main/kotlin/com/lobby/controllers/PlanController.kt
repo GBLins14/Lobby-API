@@ -26,7 +26,7 @@ class PlanController(
 
     @PostMapping("/checkout")
     fun createCheckout(@RequestBody request: SubscriptionRequest, @CurrentUser user: User): ResponseEntity<Any> {
-        val checkoutUrl = planService.createSubscriptionSession(request.subscriptionPlan, user.id)
+        val checkoutUrl = planService.createSubscriptionSession(request.subscriptionPlan, user)
 
         return ResponseEntity.ok(mapOf("success" to true, "url" to checkoutUrl))
     }
