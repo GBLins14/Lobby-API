@@ -7,7 +7,7 @@
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Swagger](https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)
 
-> **Lobby** é uma solução backend robusta para digitalizar a portaria de condomínios. Substitui o caderno de papel por uma API segura, auditável e com notificações em tempo real.
+> **Lobby** é uma solução backend robusta para digitalizar a portaria de condomínios. Substitui o caderno de papel por uma API segura, auditável e com notificações em tempo real. Acesse em https://www.uselobby.com.br/
 
 ---
 
