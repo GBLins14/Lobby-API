@@ -2,7 +2,7 @@ package com.lobby.controllers
 
 import com.lobby.annotations.CurrentUser
 import com.lobby.dto.BanDto
-import com.lobby.dto.DeliveryListDto
+import com.lobby.dto.DeliveryResponseDto
 import com.lobby.dto.SetRoleDto
 import com.lobby.dto.UserResponse
 import com.lobby.extensions.success
@@ -17,7 +17,7 @@ class SyndicController(
     private val syndicService: SyndicService,
 ) {
     @GetMapping("/deliveries")
-    fun getAllDeliveries(@CurrentUser user: User): List<DeliveryListDto> {
+    fun getAllDeliveries(@CurrentUser user: User): List<DeliveryResponseDto> {
         val deliveries = syndicService.getAllDeliveries(user.condominium!!)
         return deliveries
     }

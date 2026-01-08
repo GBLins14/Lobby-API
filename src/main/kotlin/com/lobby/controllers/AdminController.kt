@@ -29,7 +29,7 @@ class AdminController(
         return ResponseEntity.ok(accounts)
     }
 
-    @GetMapping("/accounts/pendant")
+    @GetMapping("/accounts/pendants")
     fun getPendantAccounts(@CurrentUser user: User): ResponseEntity<List<UserResponse>> {
         val accounts = syndicService.getPendingAccounts(user.condominium!!)
         return ResponseEntity.ok(accounts)

@@ -1,10 +1,10 @@
 package com.lobby.services
 
 import com.lobby.dto.BanDto
-import com.lobby.dto.DeliveryListDto
+import com.lobby.dto.DeliveryResponseDto
 import com.lobby.dto.SetRoleDto
 import com.lobby.dto.UserResponse
-import com.lobby.dto.toListResponse
+import com.lobby.dto.toResponse
 import com.lobby.dto.toResponseDTO
 import com.lobby.enums.AccountStatus
 import com.lobby.enums.Role
@@ -29,8 +29,8 @@ class SyndicService(
     private val findAccountOrThrow: FindAccountOrThrow
 ) {
 
-    fun getAllDeliveries(condominium: Condominium): List<DeliveryListDto> =
-        deliveryRepository.findByCondominium(condominium).map { it.toListResponse() }
+    fun getAllDeliveries(condominium: Condominium): List<DeliveryResponseDto> =
+        deliveryRepository.findByCondominium(condominium).map { it.toResponse() }
 
     fun getAllAccounts(condominium: Condominium): List<UserResponse> =
         accountRepository.findAllByCondominium(condominium).map { it.toResponseDTO() }
