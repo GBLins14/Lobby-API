@@ -46,7 +46,7 @@ class AdminService(
         val targetAccount = findAccountOrThrow.findAccount(condominium, request.id)
         validateHierarchy(adminAccount, targetAccount)
 
-        if (request.role == Role.SYNDIC || request.role == Role.BUSINESS) {
+        if (request.role == Role.BUSINESS) {
             throw UnauthorizedException("Você não pode promover alguém a este nível.")
         }
 

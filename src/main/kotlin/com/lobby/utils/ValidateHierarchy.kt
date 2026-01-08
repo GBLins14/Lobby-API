@@ -14,7 +14,9 @@ fun validateHierarchy(user: User, targetAccount: User) {
         if (targetAccount.role == Role.BUSINESS || targetAccount.role == Role.SYNDIC) {
             throw UnauthorizedException("Você não tem permissão para gerenciar um usuário com cargo igual ou superior ao seu.")
         }
-    } else if (targetAccount.role == Role.BUSINESS) {
-        throw UnauthorizedException("Você não tem permissão para gerenciar um usuário com cargo igual ou superior ao seu.")
+    } else if (user.role == Role.BUSINESS) {
+        if (targetAccount.role == Role.BUSINESS) {
+            throw UnauthorizedException("Você não tem permissão para gerenciar um usuário com cargo igual ou superior ao seu.")
+        }
     }
 }
