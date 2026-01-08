@@ -39,7 +39,7 @@ class PlanService(
             .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
 
             .setSuccessUrl("$FRONTEND_URL/payment/success?session_id={CHECKOUT_SESSION_ID}")
-            .setCancelUrl("$FRONTEND_URL/payment/canceled")
+            .setCancelUrl("$FRONTEND_URL/plans")
 
             .addLineItem(
                 SessionCreateParams.LineItem.builder()
