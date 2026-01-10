@@ -14,12 +14,11 @@ interface AccountRepository : JpaRepository<User, Long> {
     fun findByUsername(username: String): User?
     fun findByEmail(email: String): User?
     fun findByPhone(phone: String): User?
-    fun findAllByCondominium(condominium: Condominium): List<User>
     fun findByCondominiumAndId(condominium: Condominium, accountId: Long): User?
     fun findByCondominiumAndUsernameOrEmail(condominium: Condominium, username: String, email: String): User?
     fun findByCondominiumAndBanned(condominium: Condominium, banned: Boolean): List<User>?
     fun findByCondominiumAndAccountStatus(condominium: Condominium, accountStatus: AccountStatus): List<User>?
-    fun findByCondominiumAndBlockAndApartmentNumber(condominium: Condominium, block: String, apartmentNumber: String, accountStatus: AccountStatus = AccountStatus.APPROVED): List<User>?
+    fun findByCondominiumAndBlockAndApartmentNumberAndAccountStatus(condominium: Condominium, block: String, apartmentNumber: String, accountStatus: AccountStatus): List<User>?
     fun countByCondominiumAndBlockAndApartmentNumber(condominium: Condominium, block: String, apartmentNumber: String): Long
     @Query("""
         SELECT COUNT(DISTINCT CONCAT(u.block, '-', u.apartmentNumber)) 

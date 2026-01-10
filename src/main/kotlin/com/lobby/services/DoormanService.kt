@@ -5,6 +5,7 @@ import com.lobby.dto.DeliveryListDto
 import com.lobby.dto.DeliveryResponseDto
 import com.lobby.dto.toListResponse
 import com.lobby.dto.toResponse
+import com.lobby.enums.AccountStatus
 import com.lobby.enums.DeliveryStatus
 import com.lobby.exceptions.ConflictException
 import com.lobby.exceptions.NotFoundException
@@ -41,7 +42,7 @@ class DoormanService(
         val block = request.block.uppercase().trim()
         val apartmentNumber = request.apartmentNumber.uppercase().replace(Regex("[^A-Z0-9]"), "")
 
-        val residents = accountRepository.findByCondominiumAndBlockAndApartmentNumber(condominium, block, apartmentNumber)
+        val residents = accountRepository.findByCondominiumAndBlockAndApartmentNumberAndAccountStatus(condominium, block, apartmentNumber, AccountStatus.APPROVED)
             ?: emptyList()
 
         if (residents.isEmpty()) {

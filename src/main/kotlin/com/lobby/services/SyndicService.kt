@@ -19,6 +19,7 @@ import com.lobby.repositories.DeliveryRepository
 import com.lobby.utils.FindAccountOrThrow
 import com.lobby.utils.validateHierarchy
 import jakarta.transaction.Transactional
+import org.aspectj.weaver.ast.Not
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -33,7 +34,8 @@ class SyndicService(
         deliveryRepository.findByCondominium(condominium).map { it.toResponse() }
 
     fun getAllAccounts(condominium: Condominium): List<UserResponse> =
-        accountRepository.findAllByCondominium(condominium).map { it.toResponseDTO() }
+        accountRepository.findByCondominiumAndAccountStatus(condominium, AccountStatus.APPROVED)?.map { it.toResponseDTO() }
+            ?: throw NotFoundException("Nenhuma conta encontrada.")
 
     fun getPendingAccounts(condominium: Condominium): List<UserResponse> {
         val accounts = accountRepository.findByCondominiumAndAccountStatus(condominium, AccountStatus.PENDING)
