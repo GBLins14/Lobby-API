@@ -26,6 +26,7 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 it.requestMatchers("/api/v1/webhooks/**").permitAll()
+                it.requestMatchers("/api/v1/analytics/**").permitAll()
                 it.requestMatchers("/api/v1/auth/**").permitAll()
                 it.requestMatchers("/api/v1/doorman/**").hasAnyRole("DOORMAN", "SYNDIC", "BUSINESS")
                 it.requestMatchers("/api/v1/syndic/**").hasAnyRole("SYNDIC", "BUSINESS")
