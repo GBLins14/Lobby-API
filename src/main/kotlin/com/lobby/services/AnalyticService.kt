@@ -12,11 +12,11 @@ class AnalyticService(
 ) {
     @Transactional
     fun register(source: String, page: String, userIp: String): String {
-        val countAnalyticByUserIpAndPage = analyticRepository.findByUserIpAndPage(userIp, page).size
+        /*val countAnalyticByUserIpAndPage = analyticRepository.findByUserIpAndPage(userIp, page).size
 
         if (countAnalyticByUserIpAndPage >= 1) {
             throw ConflictException("Já existe um registro de analytics igual para este usuário.")
-        }
+        }*/
 
         val analytic = Analytic(
             source = source,
