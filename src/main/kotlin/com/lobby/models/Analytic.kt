@@ -16,5 +16,7 @@ data class Analytic(
 
     val userIp: String?,
 
+    val event: String?,
+
     val createdAt: Instant = Instant.now()
 )
