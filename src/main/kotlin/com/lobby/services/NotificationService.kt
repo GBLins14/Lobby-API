@@ -96,7 +96,7 @@ class NotificationService(
                             <tr>
                                 <td align="center" style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #f0f0f0;">
                                     <p style="color: #a0aec0; font-size: 12px; margin: 0;">
-                                        © 2025 Lobby App - Gestão Inteligente de Condomínios<br>
+                                        © 2026 Lobby App - Gestão Inteligente de Condomínios<br>
                                         Não responda a este e-mail automático.
                                     </p>
                                 </td>
