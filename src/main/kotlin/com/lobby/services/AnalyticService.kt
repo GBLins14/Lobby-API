@@ -29,9 +29,11 @@ class AnalyticService(
     }
 
     fun health(): String {
-        val analytic = "Ok"
+        analyticRepository.save(
+            Analytic(
+                event = "Health"
+            )
         )
-        analyticRepository.save(analytic)
 
         return "Analytic registrada."
     }
