@@ -91,7 +91,7 @@ class PlanNotificationService(
                             <tr>
                                 <td align="center" style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #f0f0f0;">
                                     <p style="color: #a0aec0; font-size: 12px; margin: 0;">
-                                        © 2025 Lobby App<br>
+                                        © 2026 Use Lobby<br>
                                         Obrigado por confiar no Lobby.
                                     </p>
                                 </td>
@@ -105,7 +105,7 @@ class PlanNotificationService(
         """.trimIndent()
 
         val emailRequest = mapOf(
-            "from" to "Lobby Financeiro <billing@resend.dev>",
+            "from" to "Lobby <nao-responda@mail.uselobby.com.br>",
             "to" to listOf(email),
             "subject" to "Lobby: Pagamento confirmado!",
             "html" to htmlContent
@@ -197,8 +197,8 @@ class PlanNotificationService(
                             <tr>
                                 <td align="center" style="background-color: #f8fafc; padding: 20px; text-align: center; border-top: 1px solid #f0f0f0;">
                                     <p style="color: #a0aec0; font-size: 12px; margin: 0;">
-                                        © 2025 Lobby App - Financeiro<br>
-                                        Precisa de ajuda? Responda este e-mail.
+                                        © 2026 Use Lobby<br>
+                                        Precisa de ajuda? Entre em contato.
                                     </p>
                                 </td>
                             </tr>
