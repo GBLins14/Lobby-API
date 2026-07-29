@@ -24,4 +24,10 @@ class AnalyticsController(
         val messageReturn = analyticService.register(request.source, request.page, userIp)
         return ResponseEntity.status(HttpStatus.OK).success(messageReturn)
     }
+
+    @GetMapping("/health")
+    @SecurityRequirements
+    fun health(): String {
+        return "OK"
+    }
 }
