@@ -10,11 +10,11 @@ data class Analytic(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val countId: Long = 0,
 
-    val source: String,
+    val source: String?,
 
-    val page: String,
+    val page: String?,
 
-    val userIp: String,
+    val userIp: String?,
 
     val createdAt: Instant = Instant.now()
 )
