@@ -162,7 +162,7 @@ class AuthService(
 
     @Transactional
     fun login(request: SignInDto): String {
-        val login = request.username.lowercase().trim()
+        val login = request.login.lowercase().trim()
         val user = accountRepository.findByUsernameOrEmail(login, login)
             ?: throw UnauthorizedException("Usuário ou senha incorretos.")
 
