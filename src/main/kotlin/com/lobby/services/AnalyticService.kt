@@ -28,13 +28,15 @@ class AnalyticService(
         return "Analytic registrada."
     }
 
+    @Transactional
     fun health(): String {
-        analyticRepository.save(
-            Analytic(
-                event = "Health"
-            )
-        )
-
-        return "Analytic registrada."
+        val analytic = analyticRepository.findByEvent("Health")
+            ?: Analytic(event = "Health")
+    
+        analytic.lastPing = Instant.now()
+    
+        analyticRepository.save(analytic)
+    
+        return "OK"
     }
 }
