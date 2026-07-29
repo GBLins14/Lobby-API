@@ -30,12 +30,7 @@ class AnalyticService(
 
     @Transactional
     fun health(): String {
-        val analytic = analyticRepository.findByEvent("Health")
-            ?: Analytic(event = "Health")
-    
-        analytic.lastPing = Instant.now()
-    
-        analyticRepository.save(analytic)
+        analyticRepository.count()
     
         return "OK"
     }
