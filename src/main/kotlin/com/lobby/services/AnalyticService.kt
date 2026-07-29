@@ -30,6 +30,7 @@ class AnalyticService(
 
     @Transactional
     fun health(): String {
+        println("Health (Call)")
         analyticRepository.count()
     
         return "OK"
